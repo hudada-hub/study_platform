@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Table, Button, Space, Popconfirm, message, Image, Tag } from 'antd';
+import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import AddCourseModal from './components/AddCourseModal';
 import { useCourses } from './hooks/useCourses';
@@ -75,6 +76,7 @@ export default function CoursesPage() {
       title: '标题',
       dataIndex: 'title',
       key: 'title',
+      width: 100,
       render: (text: string, record: any) => (
         <div>
           <div>{text}</div>
@@ -88,12 +90,12 @@ export default function CoursesPage() {
       title: '讲师',
       dataIndex: 'instructor',
       key: 'instructor',
-      width: 120,
+      width: 100,
     },
     {
       title: '分类/方向',
       key: 'category',
-      width: 160,
+      width: 100,
       render: (_: any, record: any) => (
         <Space direction="vertical" size="small">
           <div>分类：{record.category?.name}</div>
@@ -105,7 +107,7 @@ export default function CoursesPage() {
       title: '难度',
       dataIndex: 'level',
       key: 'level',
-      width: 100,
+      width: 50,
       render: (level: string) => (
         <Tag color={levelColors[level as keyof typeof levelColors]}>
           {levelLabels[level as keyof typeof levelLabels]}
@@ -128,9 +130,12 @@ export default function CoursesPage() {
     {
       title: '操作',
       key: 'action',
-      width: 120,
+      width: 260,
       render: (_: any, record: any) => (
         <Space size="middle">
+          <Link target='_blank' href={`/courses/${record.id}`} type="link" >
+            查看课程
+          </Link>
           <Button type="link" onClick={() => handleEditChapter(record)}>
             管理课程章节
           </Button>

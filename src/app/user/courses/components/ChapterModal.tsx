@@ -5,7 +5,6 @@ import type { UploadProps } from 'antd';
 import { request } from '@/utils/request';
 import Swal from 'sweetalert2';
 import { CosVideo } from '@/components/common/CosVideo';
-import { addWatermark } from '@/utils/videowatermark'; // 参考上面函数
 import VideoUploadWithWatermark from './VideoUploadWithWatermark';
 interface ChapterModalProps {
   open: boolean;
@@ -39,9 +38,10 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
   const [isSubChapterModalOpen, setIsSubChapterModalOpen] = useState(false);
   const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
   const [videoUrl, setVideoUrl] = useState<string>('');
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
   const [duration, setDuration] = useState<number | undefined>(undefined); // 新增
+  // 在组件内添加状态
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [uploading, setUploading] = useState(false);
 
   // 你可以在这里定义默认水印图片
   const defaultWatermarkUrl = '/watermark.png'; // 放在 public 目录下
@@ -236,8 +236,8 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
     try {
       let values = await form.validateFields();
       console.log(values,'values')
-      if(values.videoUrl){
-        values.videoUrl = values.videoUrl.split('?q-sign-algorithm')[0];
+      if(videoUrl){
+        values.videoUrl = videoUrl.split('?q-sign-algorithm')[0];
       }
       
       
@@ -270,43 +270,7 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
   };
 
   // 自定义上传方法
-  const customUpload = async ({ file, onSuccess, onError, onProgress }: any) => {
-    const formData = new FormData();
-    formData.append('file', file);
 
-    try {
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/common/upload', true);
-
-      // 处理上传进度
-      xhr.upload.addEventListener('progress', event => {
-        if (event.lengthComputable) {
-          const percent = Math.round((event.loaded / event.total) * 100);
-          setUploadProgress(percent);
-          onProgress({ percent });
-        }
-      });
-
-      // 处理请求完成
-      xhr.addEventListener('load', () => {
-        if (xhr.status === 200) {
-          const response = JSON.parse(xhr.response);
-          onSuccess(response);
-        } else {
-          onError(new Error('上传失败'));
-        }
-      });
-
-      // 处理请求错误
-      xhr.addEventListener('error', () => {
-        onError(new Error('上传失败'));
-      });
-
-      xhr.send(formData);
-    } catch (error) {
-      onError(new Error('上传失败'));
-    }
-  };
 
   // 上传视频配置
   
@@ -393,12 +357,57 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
             >
               <div className="space-y-4">
                 {!videoUrl ? (
-                  <VideoUploadWithWatermark
-                    value={videoUrl}
-                    onChange={val => setVideoUrl(val)}
-                    watermarkFile={undefined}
-                    uploadAction="/api/common/upload"
-                  />
+                  <Upload
+                    showUploadList={false}
+                    beforeUpload={async (file) => {
+                      setUploading(true);
+                      setUploadPercent(0);
+                      const formData = new FormData();
+                      formData.append('file', file);
+                      return new Promise((resolve, reject) => {
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('POST', '/api/common/upload', true);
+                        xhr.upload.onprogress = (event) => {
+                          console.log(event,'event')
+                          if (event.lengthComputable) {
+                            const percent = Math.round((event.loaded / event.total) * 100);
+                            console.log(percent,'percent')
+                            setUploadPercent(percent);
+                          }
+                        };
+                        xhr.onload = () => {
+                          setUploading(false);
+                          setUploadPercent(0);
+                          try {
+                            const data = JSON.parse(xhr.responseText);
+                            if (data.code === 0 && data.data?.url) {
+                              console.log(data.data.url,'data.data.url')
+                              setVideoUrl(data.data.url);
+                              message.success('上传成功');
+                              resolve(false);
+                            } else {
+                              message.error(data.message || '上传失败');
+                              reject();
+                            }
+                          } catch {
+                            message.error('上传失败');
+                            reject();
+                          }
+                        };
+                        xhr.onerror = () => {
+                          setUploading(false);
+                          setUploadPercent(0);
+                          message.error('上传失败');
+                          reject();
+                        };
+                        xhr.send(formData);
+                      });
+                    }}
+                  >
+                    <Button icon={<UploadOutlined />} loading={uploading} disabled={uploading}>
+                      {uploading ? '上传中...' : '上传视频'}
+                    </Button>
+                  </Upload>
                 ) : (
                   <div className="space-y-4">
                     <div className="relative w-full aspect-video bg-gray-100 rounded-lg overflow-hidden">
@@ -421,11 +430,11 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                 {duration !== undefined && (
                   <div className="text-xs text-gray-500 mt-2">视频时长：{duration} 秒</div>
                 )}
-                {isUploading && (
+                {uploading && (
                   <div className="mt-4">
                     <Progress 
-                      percent={uploadProgress} 
-                      status={uploadProgress === 100 ? 'success' : 'active'}
+                      percent={uploadPercent} 
+                      status={uploadPercent === 100 ? 'success' : 'active'}
                       strokeColor={{
                         '0%': '#108ee9',
                         '100%': '#87d068',

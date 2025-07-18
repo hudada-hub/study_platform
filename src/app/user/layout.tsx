@@ -20,7 +20,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
 ];
 
   return (
-    <div className="w-[1480px] mx-auto  py-4">
+    <div className="w-[1680px] mx-auto  py-4">
       <div className="flex flex-col md:flex-row gap-8">
         {/* 左侧选项卡导航 */}
         <div className="w-full md:w-64 flex-shrink-0  hidden md:block" >

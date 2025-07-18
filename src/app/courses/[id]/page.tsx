@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { request } from '@/utils/request';
 import { FiClock, FiStar, FiUsers, FiBook, FiLock, FiCreditCard, FiHeart, FiThumbsUp } from 'react-icons/fi';
-import Image from 'next/image';
+
 import Swal from 'sweetalert2';
-import { CosVideo } from '@/components/common/CosVideo';
+import { CosVideoWatermark } from '@/components/common/CosVideoWatermark';
 import { useParams, useRouter } from 'next/navigation';
 import { getUserAuth } from '@/utils/client-auth';
 import { CommentSection } from './CommentSection';
@@ -389,7 +389,7 @@ const CoursePage = () => {
               <PaymentRequired points={selectedChapter.points} onPay={handlePay} />
             )}
               {selectedChapter?.videoUrl ? (
-                  <CosVideo
+                  <CosVideoWatermark
                   path={selectedChapter.videoUrl}
                   controls
                   controlsList="nodownload"

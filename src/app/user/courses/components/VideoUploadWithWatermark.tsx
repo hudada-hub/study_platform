@@ -15,74 +15,16 @@ interface VideoUploadWithWatermarkProps {
 
 const VideoUploadWithWatermark: React.FC<VideoUploadWithWatermarkProps> = ({ value, onChange, watermarkFile, uploadAction }) => {
   const [uploading, setUploading] = useState(false);
-  const ffmpegRef = useRef(new FFmpeg());
   const messageRef = useRef<HTMLParagraphElement | null>(null);
-
-  // 生成 drawtext 位置参数（右上角）
-  const getDrawtextPosition = () => "x=10:y=10";
-
-  // 选择水印图片（可扩展为用户自选）
-  const getWatermarkFile = async (): Promise<File | undefined> => {
-    if (watermarkFile) return watermarkFile;
-    return undefined;
-  };
-
-  async function addWatermark(videoFile: File, watermarkFile?: File): Promise<File> {
-    const baseURL = "/ffmpeg";
-    const ffmpeg = ffmpegRef.current;
-    ffmpeg.on("log", ({ message }) => {
-      if (messageRef.current) messageRef.current.innerHTML = message;
-    });
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(
-        `${baseURL}/ffmpeg-core.wasm`,
-        "application/wasm",
-        
-      ),
-      workerURL: await toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript')
-    });
-    await ffmpeg.writeFile("input.mp4", await fetchFile(videoFile));
-    let outputName = "output.mp4";
-    if (watermarkFile) {
-      // 图片水印逻辑（保留，默认不走）
-      await ffmpeg.writeFile("watermark.png", await fetchFile(watermarkFile));
-      await ffmpeg.exec([
-        "-i", "input.mp4",
-        "-i", "watermark.png",
-        "-filter_complex", "overlay=W-w-10:10",
-        "-c:a", "copy",
-        outputName
-      ]);
-    } else {
-      await ffmpeg.writeFile('font.ttf', await fetchFile('/ffmpeg/font.ttf'));
-      // 默认文字水印，右上角，内容为“感谢观看”
-      await ffmpeg.exec([
-        "-i",
-         "input.mp4",
-        "-vf", 
-        `drawtext=fontfile=font.ttf:text='感谢观看':fontcolor=white:fontsize=36:${getDrawtextPosition()}`,
-        'output.mp4',
-        outputName
-      ]);
-    
-    }
-    const data = await ffmpeg.readFile(outputName);
-    console.log(111,data);
-    return new File([data], outputName, { type: "video/mp4" });
-  }
 
   const uploadProps = {
     showUploadList: false,
     beforeUpload: async (file: File) => {
       setUploading(true);
       try {
-        // 默认走文字水印
-        const wmFile = await getWatermarkFile();
-        const watermarkedFile = await addWatermark(file, wmFile);
-        // 上传到后端
+        // 直接上传原始视频文件，不做水印处理
         const formData = new FormData();
-        formData.append('file', watermarkedFile);
+        formData.append('file', file);
         const resp = await fetch(uploadAction, {
           method: 'POST',
           body: formData,
