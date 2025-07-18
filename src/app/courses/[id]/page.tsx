@@ -455,7 +455,7 @@ const CoursePage = () => {
               className={`px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'introduction'
                   ? 'text-orange-500'
-                  : 'text-gray-400 hover:text-gray-200'
+                  : 'text-gray-400 '
               }`}
             >
               课程介绍
@@ -468,7 +468,7 @@ const CoursePage = () => {
               className={`px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'rating'
                   ? 'text-orange-500'
-                  : 'text-gray-400 hover:text-gray-200'
+                  : 'text-gray-400 '
               }`}
             >
               课程评价
@@ -481,7 +481,7 @@ const CoursePage = () => {
               className={`px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'comments'
                   ? 'text-orange-500'
-                  : 'text-gray-400 hover:text-gray-200'
+                  : 'text-gray-400 '
               }`}
             >
               课程评论
@@ -494,7 +494,7 @@ const CoursePage = () => {
               className={`px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'catalog'
                   ? 'text-orange-500'
-                  : 'text-gray-400 hover:text-gray-200'
+                  : 'text-gray-400 '
               }`}
             >
               课程目录

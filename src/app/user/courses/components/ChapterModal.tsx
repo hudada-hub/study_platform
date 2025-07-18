@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Modal, Form, Input, Button, Table, Space, Upload, InputNumber, message, Progress } from 'antd';
 import { PlusOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import { request } from '@/utils/request';
 import Swal from 'sweetalert2';
 import { CosVideo } from '@/components/common/CosVideo';
-import VideoUploadWithWatermark from './VideoUploadWithWatermark';
+import VideoCoverCapture from '@/components/common/VideoCoverCapture';
+import VideoMultiCoverCapture, { MultiCover } from '@/components/common/VideoMultiCoverCapture';
+
+const VIDEO_ACCEPTED_TYPES = [
+  'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv', 'video/webm', 'video/ogg',
+];
 interface ChapterModalProps {
   open: boolean;
   onCancel: () => void;
@@ -42,7 +47,11 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
   // 在组件内添加状态
   const [uploadPercent, setUploadPercent] = useState(0);
   const [uploading, setUploading] = useState(false);
-
+  const [coverUrl, setCoverUrl] = useState<string>('');
+  const coverCaptureRef = useRef<{ handleCapture: () => Promise<void> }>(null);
+  // 多帧抓取相关
+  const multiCoverRef = useRef<{ handleCapture: () => Promise<MultiCover[]> }>(null);
+  const [coverCandidates, setCoverCandidates] = useState<MultiCover[]>([]);
   // 你可以在这里定义默认水印图片
   const defaultWatermarkUrl = '/watermark.png'; // 放在 public 目录下
 
@@ -154,6 +163,7 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
     setEditingChapter(null);
     setSelectedParentId(parentId);
     setVideoUrl(''); // 重置视频URL
+    setCoverUrl(''); // 重置封面URL
     form.resetFields();
     setIsSubChapterModalOpen(true);
   };
@@ -163,6 +173,7 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
     setEditingChapter(chapter);
     setSelectedParentId(chapter.parentId || null);
     setVideoUrl(chapter.videoUrl || '');
+    setCoverUrl((chapter as any).coverUrl || ''); // 编辑时回显封面
     form.setFieldsValue({
       title: chapter.title,
       description: chapter.description,
@@ -228,6 +239,7 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
   // 处理删除视频
   const handleRemoveVideo = () => {
     setVideoUrl('');
+    setCoverUrl(''); // 删除视频时同步清空封面
     form.setFieldValue('videoUrl', '');
   };
 
@@ -247,7 +259,9 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
         parentId: selectedParentId,
         duration:duration,
       };
-
+      if (coverUrl) {
+        data.coverUrl = coverUrl;
+      }
       if (editingChapter) {
         await request(`/courses/${courseId}/chapters/${editingChapter.id}`, {
           method: 'PUT',
@@ -278,6 +292,7 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
   // 重置表单和状态
   const handleModalClose = () => {
     setVideoUrl('');
+    setCoverUrl(''); // 重置封面URL
     setIsSubChapterModalOpen(false);
     form.resetFields();
   };
@@ -360,6 +375,30 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                   <Upload
                     showUploadList={false}
                     beforeUpload={async (file) => {
+                      // 1. 校验格式
+                      if (!VIDEO_ACCEPTED_TYPES.includes(file.type)) {
+                        message.error('不支持的文件格式');
+                        return false;
+                      }
+                      // 2. 校验原生video可播放性和获取duration
+                      const url = URL.createObjectURL(file);
+                      let videoDuration = 0;
+                      const canPlay = await new Promise<boolean>((resolve) => {
+                        const testVideo = document.createElement('video');
+                        testVideo.preload = 'metadata';
+                        testVideo.src = url;
+                        testVideo.onloadedmetadata = () => {
+                          videoDuration = testVideo.duration;
+                          resolve(true);
+                        };
+                        testVideo.onerror = () => resolve(false);
+                      });
+                      URL.revokeObjectURL(url);
+                      if (!canPlay || !videoDuration || isNaN(videoDuration)) {
+                        message.error('无法识别视频或视频损坏');
+                        return false;
+                      }
+                      setDuration(videoDuration);
                       setUploading(true);
                       setUploadPercent(0);
                       const formData = new FormData();
@@ -384,6 +423,36 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                               console.log(data.data.url,'data.data.url')
                               setVideoUrl(data.data.url);
                               message.success('上传成功');
+                              setCoverUrl(''); // 上传新视频时重置封面，防止脏数据
+                              setCoverCandidates([]);
+                              if (multiCoverRef.current) {
+                                message.loading({ content: '正在抓取视频多帧...', key: 'cover' });
+                                multiCoverRef.current.handleCapture().then(async (covers: MultiCover[]) => {
+  // 遍历上传到COS
+  const uploadPromises = covers.map((item) => {
+    const formData = new FormData();
+    formData.append('file', item.blob, 'cover.jpg');
+    return fetch('/api/common/upload', {
+      method: 'POST',
+      body: formData,
+    }).then(res => res.json());
+  });
+  const results = await Promise.all(uploadPromises);
+  const cosCovers: MultiCover[] = covers.map((item, idx) => {
+    const url = results[idx]?.code === 0 && results[idx]?.data?.url ? results[idx].data.url : '';
+    return { ...item, cosUrl: url };
+  }).filter(item => !!item.cosUrl);
+  setCoverCandidates(cosCovers);
+  if (cosCovers.length > 0) {
+    setCoverUrl(''); // 默认不选
+    message.success({ content: '抓取封面成功，请选择喜欢的封面', key: 'cover' });
+  } else {
+    message.error({ content: '未能抓取到有效封面', key: 'cover' });
+  }
+}).catch(() => {
+  message.error({ content: '视频多帧抓取失败', key: 'cover' });
+});
+                              }
                               resolve(false);
                             } else {
                               message.error(data.message || '上传失败');
@@ -442,6 +511,46 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                     />
                   </div>
                 )}
+              {/* 多帧候选封面选择 */}
+              {coverCandidates.length > 0 && (
+                <div className="flex items-center space-x-4 mt-2">
+                  {coverCandidates.map((item, idx) => (
+                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <img
+                        src={item.cosUrl}
+                        alt={`封面${idx+1}`}
+                        style={{
+                          width: 120,
+                          height: 68,
+                          objectFit: 'cover',
+                          borderRadius: 8,
+                          border: coverUrl === item.cosUrl ? '2px solid #1677ff' : '1px solid #eee',
+                          cursor: 'pointer',
+                          boxShadow: coverUrl === item.cosUrl ? '0 0 8px #1677ff55' : undefined
+                        }}
+                        onClick={() => setCoverUrl(item.cosUrl!)}
+                      />
+                      <span style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{Math.round(item.time)}s</span>
+                      {coverUrl === item.cosUrl && <span style={{ color: '#1677ff', fontSize: 12 }}>已选</span>}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* 兼容单帧旧逻辑的预览与删除 */}
+              {coverUrl && coverCandidates.length === 0 && (
+                <div className="flex items-center space-x-4 mt-2">
+                  <img src={coverUrl} alt="视频封面" style={{ width: 120, height: 68, objectFit: 'cover', borderRadius: 8, border: '1px solid #eee' }} />
+                  <Button danger size="small" onClick={() => setCoverUrl('')}>删除封面</Button>
+                </div>
+              )}
+              <VideoMultiCoverCapture
+                ref={multiCoverRef}
+                videoUrl={videoUrl}
+                count={5}
+                onCovers={() => {
+                  
+                }}
+              />
               </div>
             </Form.Item>
           )}

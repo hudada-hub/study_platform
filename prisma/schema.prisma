@@ -396,11 +396,7 @@ enum WatermarkPosition {
   BOTTOM_LEFT  // 左下
 }
 
-// 水印类型枚举
-enum WatermarkType {
-  IMAGE       // 图片
-  TEXT        // 文本
-}
+
 
 // 课程分类表
 model CourseCategory {
@@ -430,10 +426,7 @@ model Course {
   instructor      String           @db.VarChar(100)
   viewCount       Int              @default(0)
   studentCount    Int              @default(0)
-  watermarkType   WatermarkType
-  watermarkContent String          @db.VarChar(500)
-  watermarkPosition WatermarkPosition
-  textFormat      Json?            // 存储文本格式的JSON，包含颜色和大小
+  
   direction       CourseDirection  @relation(fields: [directionId], references: [id])
   directionId     Int
   level          CourseLevel
@@ -493,6 +486,7 @@ model CourseChapter {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   orders      CourseOrder[] // 添加反向关系
+  coverUrl    String? @db.VarChar(500)
 
   @@index([courseId])
   @@index([parentId])

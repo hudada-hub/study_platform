@@ -187,10 +187,10 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
             placeholder="请选择课程难度"
             options={[
               { label: '入门', value: 'BEGINNER' },
-              { label: '初级', value: 'ELEMENTARY' },
-              { label: '中级', value: 'INTERMEDIATE' },
+              { label: '初级', value: 'INTERMEDIATE' },
+          
               { label: '高级', value: 'ADVANCED' },
-              { label: '专家', value: 'EXPERT' },
+             
             ]}
           />
         </Form.Item>
@@ -219,49 +219,8 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
           <Input.TextArea rows={2} placeholder="请输入学完本课程可以达到的目标" />
         </Form.Item>
 
-        {/* 水印设置 */}
-        <div className="bg-gray-50 p-4 rounded-lg mb-4">
-          <div className="text-base mb-4">水印设置</div>
-          <Form.Item
-            name="watermarkType"
-            label="水印类型"
-            rules={[{ required: true, message: '请选择水印类型' }]}
-            initialValue="TEXT"
-          >
-            <Select
-              options={[
-                { label: '文字水印', value: 'TEXT' },
-                { label: '图片水印', value: 'IMAGE' },
-              ]}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="watermarkContent"
-            label="水印内容"
-            rules={[{ required: true, message: '请输入水印内容' }]}
-            initialValue="仅供学习使用"
-          >
-            <Input placeholder="请输入水印内容" />
-          </Form.Item>
-
-          <Form.Item
-            name="watermarkPosition"
-            label="水印位置"
-            rules={[{ required: true, message: '请选择水印位置' }]}
-            initialValue="TOP_RIGHT"
-          >
-            <Select
-              options={[
-                { label: '左上角', value: 'TOP_LEFT' },
-                { label: '右上角', value: 'TOP_RIGHT' },
-                { label: '左下角', value: 'BOTTOM_LEFT' },
-                { label: '右下角', value: 'BOTTOM_RIGHT' },
-                { label: '居中', value: 'CENTER' },
-              ]}
-            />
-          </Form.Item>
-        </div>
+       
+        
 
         <Form.Item>
           <Space>

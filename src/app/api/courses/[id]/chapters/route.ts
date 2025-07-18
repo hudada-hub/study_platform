@@ -82,6 +82,7 @@ export async function POST(
         videoUrl: data.videoUrl,
         points: data.points,
         sort: data.sort,
+        coverUrl:data.coverUrl,
         parent: data.parentId ? {
           connect: { id: data.parentId }
         } : undefined,
