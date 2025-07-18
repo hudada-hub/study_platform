@@ -1,0 +1,82 @@
+{
+  // 编辑器设置
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.tabSize": 2,
+  "editor.wordWrap": "on",
+  "editor.wordWrapColumn": 120,
+  "editor.wrappingIndent": "indent",
+  "diffEditor.wordWrap": "on",
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "on",
+      "strings": "on",
+      "other": "on"
+    }
+  },
+  "[typescript]": {
+    "editor.wordWrap": "on"
+  },
+  "[typescriptreact]": {
+    "editor.wordWrap": "on"
+  },
+  "[javascript]": {
+    "editor.wordWrap": "on"
+  },
+  "[javascriptreact]": {
+    "editor.wordWrap": "on"
+  },
+
+  // TypeScript 设置
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // 文件关联
+  "files.associations": {
+    "*.css": "tailwindcss",
+    "*.scss": "scss",
+    "*.ts": "typescript",
+    "*.tsx": "typescriptreact"
+  },
+
+  // 搜索排除
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist": true,
+    "**/coverage": true
+  },
+
+  // 文件排除
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true
+  },
+
+  // 终端设置
+  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.defaultProfile.osx": "bash",
+
+  // Git 设置
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+
+  // 自动保存
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+
+  // 路径别名提示
+  "path-intellisense.mappings": {
+    "@": "${workspaceFolder}/src"
+  }
+} 

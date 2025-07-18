@@ -1,0 +1,41 @@
+# 定义服务编排
+services:
+  # PostgreSQL 数据库服务
+  postgres:
+    container_name: study_platform_postgres
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root123456
+      - POSTGRES_DB=study_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - study_platform_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d study_platform"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  # 测试容器
+  test-db:
+    image: postgres:latest
+    command: psql postgresql://root:root123456@postgres:5432/study_platform
+    networks:
+      - study_platform_network
+    depends_on:
+      - postgres
+
+# 定义持久化卷
+volumes:
+  postgres_data:
+    driver: local
+
+# 定义网络
+networks:
+  study_platform_network:
+    driver: bridge

@@ -1,0 +1,991 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Article {
+  id           Int            @id @default(autoincrement())
+  title        String         @db.VarChar(200)
+  summary      String?        @db.Text
+  content      String         @db.Text
+  coverUrl     String?        @db.VarChar(500) // 封面图URL
+  viewCount    Int            @default(0)
+  likeCount    Int           @default(0)
+  commentCount Int           @default(0)
+  status       ArticleStatus @default(DRAFT)
+  category     ArticleCategory @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+  author       User          @relation(fields: [authorId], references: [id])
+  authorId     Int
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  articleComments     ArticleComment[]
+
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ArticleCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  sort        Int      @default(0)
+  isEnabled   Boolean  @default(true)
+  parentId    Int?
+  parent      ArticleCategory?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children    ArticleCategory[] @relation("CategoryChildren")
+  articles    Article[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum UserRole {
+  USER
+  REVIEWER
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+// 充值状态枚举
+enum RechargeStatus {
+  PENDING    // 待支付
+  PAID       // 已支付
+  COMPLETED  // 已完成（积分已发放）
+  FAILED     // 失败
+  CANCELLED  // 已取消
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  nickname    String   @unique
+  phone       String   @unique
+  password    String
+  email       String?  @unique
+  avatar      String?  @default("/default-avatar.png")
+  role        UserRole     @default(USER)
+  status      UserStatus   @default(ACTIVE)
+  loginCount  Int      @default(0)
+  lastLoginIp String?
+  bio         String?
+  wechat      String?  // 微信号
+  qq          String?  // QQ号
+  points      Int      @default(0)  // 积分点数
+  studyTime   Int      @default(0)  // 学习时长（分钟）
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastLoginAt DateTime @default(now())
+
+  // 现有关联
+  articleComments       ArticleComment[]
+  articles       Article[]
+  orders         Order[]
+  articleCommentLikes   ArticleCommentLike[]
+
+  // 课程相关关联
+  courseOrders        CourseOrder[]
+  courseComments      CourseComment[]
+  courseCommentLikes  CourseCommentLike[]
+  courseRatings      CourseRating[]
+  courseLikes        CourseLike[]
+  courseFavorites    CourseFavorite[]
+
+  // 论坛相关关联
+  forumPosts        ForumPost[]
+  forumComments     ForumComment[]
+  forumCommentLikes ForumCommentLike[]
+  forumCommentDislikes ForumCommentDislike[]
+  forumPostLikes    ForumPostLike[]
+  forumPostFavorites ForumPostFavorite[]
+  forumSectionFavorites ForumSectionFavorite[]
+  moderatedSections ForumSection[] @relation("SectionModerator")
+  forumCommentReports ForumCommentReport[]
+  forumPostReports  ForumPostReport[]
+
+  // 接单相关关联
+  publishedTasks    Task[]            @relation("TaskAuthor")
+  taskApplications  TaskApplication[] @relation("TaskApplicant")
+  taskAssignments   TaskAssignment[]  @relation("TaskAssignee")
+  taskComments      TaskComment[]     @relation("TaskCommentAuthor")
+  taskLikes         TaskLike[]        @relation("TaskLiker")
+  taskFavorites     TaskFavorite[]    @relation("TaskFavoriter")
+
+  // 新增关联
+  rechargeRecords  RechargeRecord[]  // 充值记录
+  messages         UserMessage[]      // 用户留言
+  wallet           Wallet?
+
+  // 课程章节上传
+  uploadedChapters CourseChapter[]
+
+  @@index([phone])
+  @@index([nickname])
+  @@index([points])  // 添加积分索引
+  Course Course[]
+}
+
+
+
+model ArticleComment {
+  id          Int      @id @default(autoincrement())
+  content     String   @db.Text
+  createdAt   DateTime @default(now())
+  isActive    Boolean  @default(true)
+  likeCount   Int      @default(0)
+  isDeleted   Boolean  @default(false)
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  article     Article? @relation(fields: [articleId], references: [id])
+
+  articleId   Int?
+  // 评论回复功能（新增）
+  parentComment  ArticleComment?  @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  parentCommentId Int?     // 父评论ID（顶级评论为null）
+  replies        ArticleComment[] @relation("CommentReplies") // 子评论列表
+  // 点赞关系
+  likes         ArticleCommentLike[]
+}
+
+
+
+// 评论点赞关系表
+model ArticleCommentLike {
+  id        Int      @id @default(autoincrement())
+  comment   ArticleComment  @relation(fields: [commentId], references: [id])
+  commentId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, commentId])
+}
+
+
+
+
+
+
+
+
+
+// 配置项类型枚举
+enum ConfigType {
+  TEXT          // 单行文本
+  TEXTAREA      // 多行文本
+  IMAGE         // 单张图片
+  MULTI_IMAGE   // 多张图片
+  MULTI_TEXT    // 多行文本（带链接）
+  MULTI_CONTENT // 多文本图片混合（带链接）
+  RICH_TEXT     // 富文本编辑器
+}
+
+// 配置表
+model Config {
+  id          Int         @id @default(autoincrement())
+  key         String      @unique @db.VarChar(100) // 配置键名
+  title       String      @db.VarChar(100) // 配置名称
+  type        ConfigType  // 配置类型
+  description String?     @db.Text // 配置描述
+  sort        Int         @default(0) // 排序
+  isEnabled   Boolean     @default(true) // 是否启用
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // 根据type类型，关联不同的值表
+  textValue           ConfigTextValue?          // TEXT/TEXTAREA类型的值
+  imageValue         ConfigImageValue?         // IMAGE类型的值
+  multiImageValues    ConfigMultiImageValue[]   // MULTI_IMAGE类型的值
+  multiTextValues     ConfigMultiTextValue[]    // MULTI_TEXT类型的值
+  multiContentValues  ConfigMultiContentValue[] // MULTI_CONTENT类型的值
+
+  @@index([type])
+  @@index([sort])
+  @@index([isEnabled])
+}
+
+// 文本类型配置值表（用于TEXT和TEXTAREA类型）
+model ConfigTextValue {
+  id        Int      @id @default(autoincrement())
+  config    Config   @relation(fields: [configId], references: [id], onDelete: Cascade)
+  configId  Int      @unique // 一对一关系
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@index([configId])
+}
+
+// 图片类型配置值表（用于IMAGE类型）
+model ConfigImageValue {
+  id        Int      @id @default(autoincrement())
+  config    Config   @relation(fields: [configId], references: [id], onDelete: Cascade)
+  configId  Int      @unique // 一对一关系
+  url       String   @db.VarChar(500)
+  link      String?  @db.VarChar(500) // 可选的跳转链接
+  alt       String?  @db.VarChar(200) // 图片描述
+  updatedAt DateTime @updatedAt
+
+  @@index([configId])
+}
+
+// 多图片类型配置值表（用于MULTI_IMAGE类型）
+model ConfigMultiImageValue {
+  id        Int      @id @default(autoincrement())
+  config    Config   @relation(fields: [configId], references: [id], onDelete: Cascade)
+  configId  Int
+  url       String   @db.VarChar(500)
+  link      String?  @db.VarChar(500) // 可选的跳转链接
+  alt       String?  @db.VarChar(200) // 图片描述
+  sort      Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@index([configId, sort])
+}
+
+// 多文本类型配置值表（用于MULTI_TEXT类型）
+model ConfigMultiTextValue {
+  id        Int      @id @default(autoincrement())
+  config    Config   @relation(fields: [configId], references: [id], onDelete: Cascade)
+  configId  Int
+  title     String   @db.VarChar(200)
+  content   String   @db.Text
+  contentEn String?  @db.Text // 英文内容
+  link      String?  @db.VarChar(500) // 可选的跳转链接
+  sort      Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@index([configId, sort])
+}
+
+// 多文本图片混合类型配置值表（用于MULTI_CONTENT类型）
+model ConfigMultiContentValue {
+  id        Int      @id @default(autoincrement())
+  config    Config   @relation(fields: [configId], references: [id], onDelete: Cascade)
+  configId  Int
+  title     String   @db.VarChar(200)
+  content   String   @db.Text
+  contentEn String?  @db.Text // 英文内容
+  imageUrl  String?  @db.VarChar(500)
+  link      String?  @db.VarChar(500) // 可选的跳转链接
+  alt       String?  @db.VarChar(200) // 图片描述
+  sort      Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@index([configId, sort])
+}
+
+// 订单状态枚举
+enum OrderStatus {
+  PENDING    // 待支付
+  PAID       // 已支付
+  CANCELLED  // 已取消
+  REFUNDED   // 已退款
+  FAILED     // 支付失败
+}
+
+// 支付方式枚举
+enum PaymentMethod {
+  ALIPAY     // 支付宝
+  WECHAT     // 微信支付（预留）
+  BALANCE    // 余额支付（预留）
+}
+
+// 订单类型枚举
+enum OrderType {
+  COURSE     // 课程订单
+  RECHARGE   // 充值订单
+  VIP        // 会员订单
+  TASK       // 任务订单
+  REGISTER   // 注册订单
+}
+
+// 订单表
+model Order {
+  id            String       @id @default(cuid()) // 使用cuid作为订单ID
+  orderNo       String      @unique // 订单编号（展示用）
+  type          OrderType   // 订单类型
+  title         String      // 订单标题
+  amount        Decimal     @db.Decimal(10, 2) // 订单金额
+  status        OrderStatus @default(PENDING) // 订单状态
+  paymentMethod PaymentMethod // 支付方式
+  
+  // 支付相关信息
+  paymentTime   DateTime?   // 支付时间
+  paymentNo     String?     // 支付平台交易号
+  refundTime    DateTime?   // 退款时间
+  refundNo      String?     // 退款单号
+  
+  // 关联用户
+  user          User?        @relation(fields: [userId], references: [id])
+  userId        Int?
+
+  // 订单详情（根据type存储不同的关联ID）
+  courseId      Int?        // 课程ID
+  taskId        Int?        // 任务ID
+  
+  // 其他信息
+  remark        String?     // 订单备注
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  expiredAt     DateTime    // 订单过期时间
+  metadata      Json?       // 订单元数据
+
+  // 新增关联
+  rechargeRecord RechargeRecord?
+
+  @@index([userId])
+  @@index([orderNo])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
+
+
+
+
+
+// 验证码表
+model VerificationCode {
+  id        String   @id @default(cuid())
+  phone     String   // 手机号
+  code      String   // 验证码
+  expiresAt DateTime // 过期时间
+  type      String   // 验证码类型
+  isUsed    Boolean  @default(false) // 是否已使用
+  createdAt DateTime @default(now()) // 创建时间
+  updatedAt DateTime @updatedAt // 更新时间
+
+  @@index([phone, code])
+  @@index([phone, expiresAt])
+}
+
+// 课程难度枚举
+enum CourseLevel {
+  BEGINNER    // 初级
+  INTERMEDIATE // 中级
+  ADVANCED     // 高级
+}
+
+// 课程状态枚举
+enum CourseStatus {
+  COMPLETED   // 已完结
+  ONGOING     // 未完结
+}
+
+// 水印位置枚举
+enum WatermarkPosition {
+  FULLSCREEN  // 满屏
+  MOVING      // 移动
+  TOP_LEFT    // 左上
+  TOP_RIGHT   // 右上
+  CENTER      // 中间
+  BOTTOM_RIGHT // 右下
+  BOTTOM_LEFT  // 左下
+}
+
+// 水印类型枚举
+enum WatermarkType {
+  IMAGE       // 图片
+  TEXT        // 文本
+}
+
+// 课程分类表
+model CourseCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  courses     Course[]
+}
+
+// 课程方向表
+model CourseDirection {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  courses     Course[]
+}
+
+// 视频课程表
+model Course {
+  id              Int              @id @default(autoincrement())
+  title           String           @db.VarChar(200)
+  coverUrl        String           @db.VarChar(500)
+  summary         String?          @db.Text
+  description     String           @db.Text
+  instructor      String           @db.VarChar(100)
+  viewCount       Int              @default(0)
+  studentCount    Int              @default(0)
+  watermarkType   WatermarkType
+  watermarkContent String          @db.VarChar(500)
+  watermarkPosition WatermarkPosition
+  textFormat      Json?            // 存储文本格式的JSON，包含颜色和大小
+  direction       CourseDirection  @relation(fields: [directionId], references: [id])
+  directionId     Int
+  level          CourseLevel
+  status         CourseStatus     @default(ONGOING)
+  episodeCount   Int              @default(0)
+  totalDuration  Int              @default(0)    // 总时长（分钟）
+  tags           String[]         // 课程标签
+  targetAudience String          @db.Text       // 适合人群
+  ratingScore    Float           @default(0)    // 好评率
+  likeCount      Int             @default(0)
+  favoriteCount  Int             @default(0)
+  courseGoals    String          @db.Text       // 课程目标
+  isTop          Boolean         @default(false) // 是否置顶
+  isDeleted      Boolean         @default(false) // 是否删除
+  isHidden       Boolean         @default(false) // 是否隐藏
+  category       CourseCategory  @relation(fields: [categoryId], references: [id])
+  categoryId     Int
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  // 关联
+  chapters       CourseChapter[]
+  orders         CourseOrder[]
+  comments       CourseComment[]
+  ratings        CourseRating[]
+  likes          CourseLike[]
+  favorites      CourseFavorite[]
+  uploader       User           @relation(fields: [uploaderId], references: [id])
+  uploaderId     Int
+
+  @@index([directionId])
+  @@index([categoryId])
+  @@index([level])
+  @@index([status])
+  @@index([isTop])
+  @@index([isDeleted])
+  @@index([isHidden])
+}
+
+// 视频章节表
+model CourseChapter {
+  id          Int      @id @default(autoincrement())
+  parentId    Int?     // 父章节ID
+  parent      CourseChapter? @relation("ChapterChildren", fields: [parentId], references: [id])
+  children    CourseChapter[] @relation("ChapterChildren")
+  title       String   @db.VarChar(200)
+  description String?  @db.Text
+  videoUrl    String?   @db.VarChar(500)
+  course      Course   @relation(fields: [courseId], references: [id])
+  courseId    Int
+  duration    Int?      // 时长（分钟）
+  points      Int      @default(0) // 所需积分
+  viewCount   Int      @default(0)
+  sort        Int      @default(0)
+  uploader    User     @relation(fields: [uploaderId], references: [id]) // 上传人
+  uploaderId  Int      // 上传人ID
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      CourseOrder[] // 添加反向关系
+
+  @@index([courseId])
+  @@index([parentId])
+  @@index([sort])
+  @@index([uploaderId])
+}
+
+// 用户购买课程订单表
+model CourseOrder {
+  id          String    @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  course      Course   @relation(fields: [courseId], references: [id])
+  courseId    Int
+  chapter     CourseChapter @relation(fields: [chapterId], references: [id])
+  chapterId   Int
+  points      Int      // 购买使用的积分
+  progress    Float    @default(0) // 学习进度（百分比）
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([chapterId])
+}
+
+// 课程评论表
+model CourseComment {
+  id          Int      @id @default(autoincrement())
+  content     String   @db.Text
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  course      Course   @relation(fields: [courseId], references: [id])
+  courseId    Int
+  chapterId   Int?     // 可选，指定是哪个视频章节的评论
+  createdAt   DateTime @default(now())
+  parentId    Int?     // 父评论ID
+  parent      CourseComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies     CourseComment[] @relation("CommentReplies")
+  likes       CourseCommentLike[]
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([chapterId])
+  @@index([parentId])
+}
+
+// 课程评论点赞表
+model CourseCommentLike {
+  id          Int           @id @default(autoincrement())
+  comment     CourseComment @relation(fields: [commentId], references: [id])
+  commentId   Int
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime      @default(now())
+
+  @@unique([userId, commentId])
+}
+
+// 课程评价表
+model CourseRating {
+  id                  Int      @id @default(autoincrement())
+  user                User     @relation(fields: [userId], references: [id])
+  userId              Int
+  course              Course   @relation(fields: [courseId], references: [id])
+  courseId            Int
+  isAnonymous         Boolean  @default(false)
+  descriptionRating   Int      // 课程与描述相符评分(1-5)
+  valueRating         Int      // 课程内容的价值评分(1-5)
+  teachingRating      Int      // 老师讲解与表达评分(1-5)
+  createdAt           DateTime @default(now())
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+}
+
+// 课程点赞表
+model CourseLike {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  course      Course   @relation(fields: [courseId], references: [id])
+  courseId    Int
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+}
+
+// 课程收藏表
+model CourseFavorite {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  course      Course   @relation(fields: [courseId], references: [id])
+  courseId    Int
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+}
+
+// 帖子状态枚举
+enum PostStatus {
+  PENDING    // 待审核
+  PUBLISHED  // 已发布
+  REJECTED   // 已拒绝
+  DRAFT      // 草稿
+  DELETED    // 已删除
+}
+
+// 板块分类表
+model ForumCategory {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  sections    ForumSection[]
+
+  @@index([name])
+}
+
+// 板块表
+model ForumSection {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(100)
+  description     String    @db.Text
+  coverUrl        String?   @db.VarChar(500)
+  category        ForumCategory @relation(fields: [categoryId], references: [id])
+  categoryId      Int
+  moderator       User      @relation("SectionModerator", fields: [moderatorId], references: [id])
+  moderatorId     Int
+  createdAt       DateTime  @default(now())
+  lastPostAt      DateTime  @default(now())
+  postCount       Int       @default(0)
+  sort            Int       @default(0)
+  parentId        Int?      // 父板块ID
+  parent          ForumSection? @relation("SectionChildren", fields: [parentId], references: [id])
+  children        ForumSection[] @relation("SectionChildren")
+  announcement    String?   @db.Text
+  favoriteCount   Int       @default(0)
+  updatedAt       DateTime  @updatedAt
+
+  // 关联
+  posts           ForumPost[]
+  favorites       ForumSectionFavorite[]
+
+  @@index([categoryId])
+  @@index([moderatorId])
+  @@index([parentId])
+  @@index([sort])
+}
+
+// 板块收藏表
+model ForumSectionFavorite {
+  id          Int           @id @default(autoincrement())
+  section     ForumSection  @relation(fields: [sectionId], references: [id])
+  sectionId   Int
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime      @default(now())
+
+  @@unique([userId, sectionId])
+  @@index([sectionId])
+}
+
+// 帖子表
+model ForumPost {
+  id            Int         @id @default(autoincrement())
+  title         String      @db.VarChar(200)
+  content       String      @db.Text
+  author        User        @relation(fields: [authorId], references: [id])
+  authorId      Int
+  isTop         Boolean     @default(false)
+  isEssence     Boolean     @default(false)
+  isHot         Boolean     @default(false)
+  isNewbie      Boolean     @default(false)
+  status        PostStatus  @default(PENDING)
+  likeCount     Int         @default(0)
+  commentCount  Int         @default(0)
+  viewCount     Int         @default(0)
+  section       ForumSection @relation(fields: [sectionId], references: [id])
+  sectionId     Int
+  coverUrl      String?     @db.VarChar(500)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // 关联
+  comments      ForumComment[]
+  likes         ForumPostLike[]
+  favorites     ForumPostFavorite[]
+  reports       ForumPostReport[]
+
+  @@index([authorId])
+  @@index([sectionId])
+  @@index([status])
+  @@index([isTop])
+  @@index([isHot])
+  @@index([createdAt])
+}
+
+// 帖子评论表
+model ForumComment {
+  id              Int         @id @default(autoincrement())
+  content         String      @db.Text
+  author          User        @relation(fields: [authorId], references: [id])
+  authorId        Int
+  post            ForumPost   @relation(fields: [postId], references: [id])
+  postId          Int
+  parentId        Int?        // 父评论ID
+  parent          ForumComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies         ForumComment[] @relation("CommentReplies")
+  likeCount       Int         @default(0)
+  dislikeCount    Int         @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // 关联
+  likes          ForumCommentLike[]
+  dislikes       ForumCommentDislike[]
+  reports        ForumCommentReport[]
+
+  @@index([authorId])
+  @@index([postId])
+  @@index([parentId])
+}
+
+// 帖子评论点赞表
+model ForumCommentLike {
+  id          Int           @id @default(autoincrement())
+  comment     ForumComment  @relation(fields: [commentId], references: [id])
+  commentId   Int
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime      @default(now())
+
+  @@unique([userId, commentId])
+  @@index([commentId])
+}
+
+// 帖子评论踩表
+model ForumCommentDislike {
+  id          Int           @id @default(autoincrement())
+  comment     ForumComment  @relation(fields: [commentId], references: [id])
+  commentId   Int
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime      @default(now())
+
+  @@unique([userId, commentId])
+  @@index([commentId])
+}
+
+// 帖子评论举报表
+model ForumCommentReport {
+  id          Int           @id @default(autoincrement())
+  comment     ForumComment  @relation(fields: [commentId], references: [id])
+  commentId   Int
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  content     String        @db.Text
+  createdAt   DateTime      @default(now())
+
+  @@index([commentId])
+  @@index([userId])
+}
+
+// 帖子点赞表
+model ForumPostLike {
+  id          Int           @id @default(autoincrement())
+  post        ForumPost     @relation(fields: [postId], references: [id])
+  postId      Int
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime      @default(now())
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+// 帖子收藏表
+model ForumPostFavorite {
+  id          Int           @id @default(autoincrement())
+  post        ForumPost     @relation(fields: [postId], references: [id])
+  postId      Int
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime      @default(now())
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+// 帖子举报表
+model ForumPostReport {
+  id          Int           @id @default(autoincrement())
+  post        ForumPost     @relation(fields: [postId], references: [id])
+  postId      Int
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  content     String        @db.Text
+  createdAt   DateTime      @default(now())
+
+  @@index([postId])
+  @@index([userId])
+}
+
+// 任务状态枚举
+enum TaskStatus {
+  PENDING     // 待审核
+  APPROVED    // 已通过
+  REJECTED    // 已拒绝
+  IN_PROGRESS // 执行中
+  COMPLETED   // 接单者已完成
+  CONFIRMED   // 发布者已确认
+}
+
+// 接单分类表
+model TaskCategory {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  imageUrl    String    @db.VarChar(500)
+  description String    @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  tasks       Task[]
+
+  @@index([name])
+}
+
+// 发布任务表
+model Task {
+  id            Int         @id @default(autoincrement())
+  author        User        @relation("TaskAuthor", fields: [authorId], references: [id])
+  authorId      Int
+  category      TaskCategory @relation(fields: [categoryId], references: [id])
+  categoryId    Int
+  title         String      @db.VarChar(200)
+  content       String      @db.Text
+  status        TaskStatus  @default(PENDING)
+  points        Int         // 悬赏积分
+  isTop         Boolean     @default(false)
+  isDeleted     Boolean     @default(false)
+  isHidden      Boolean     @default(false)
+  viewCount     Int         @default(0)
+  attachments   Json?       // 任务附件，存储为JSON数组
+  rejectReason  String?     @db.Text
+  completedAt   DateTime?   // 任务完成时间
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // 关联
+  applications  TaskApplication[]
+  assignment    TaskAssignment?
+  comments      TaskComment[]
+  likes        TaskLike[]
+  favorites    TaskFavorite[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([isTop])
+  @@index([isDeleted])
+  @@index([isHidden])
+}
+
+// 任务报名表
+model TaskApplication {
+  id          Int       @id @default(autoincrement())
+  applicant   User      @relation("TaskApplicant", fields: [applicantId], references: [id])
+  applicantId Int
+  task        Task      @relation(fields: [taskId], references: [id])
+  taskId      Int
+  createdAt   DateTime  @default(now())
+
+  @@index([applicantId])
+  @@index([taskId])
+}
+
+// 接单任务表（任务分配）
+model TaskAssignment {
+  id            Int       @id @default(autoincrement())
+  task          Task      @relation(fields: [taskId], references: [id])
+  taskId        Int       @unique    // 一个任务只能分配给一个人
+  assignee      User      @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  assigneeId    Int
+  assignedAt    DateTime  @default(now())
+  proof         String?   @db.Text   // 完成证明
+  fileUrls      Json?     // 完成文件，存储为JSON数组
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([assigneeId])
+}
+
+// 接单评论表
+model TaskComment {
+  id          Int       @id @default(autoincrement())
+  content     String    @db.Text
+  author      User      @relation("TaskCommentAuthor", fields: [authorId], references: [id])
+  authorId    Int
+  task        Task      @relation(fields: [taskId], references: [id])
+  taskId      Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([authorId])
+  @@index([taskId])
+}
+
+// 接单点赞表
+model TaskLike {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation("TaskLiker", fields: [userId], references: [id])
+  userId      Int
+  task        Task      @relation(fields: [taskId], references: [id])
+  taskId      Int
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, taskId])
+  @@index([taskId])
+}
+
+// 接单收藏表
+model TaskFavorite {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation("TaskFavoriter", fields: [userId], references: [id])
+  userId      Int
+  task        Task      @relation(fields: [taskId], references: [id])
+  taskId      Int
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, taskId])
+  @@index([taskId])
+}
+
+// 充值记录表
+model RechargeRecord {
+  id          Int            @id @default(autoincrement())
+  order       Order          @relation(fields: [orderId], references: [id])
+  orderId     String        @unique  // 一对一关系需要唯一约束
+  user        User           @relation(fields: [userId], references: [id])
+  userId      Int
+  amount      Decimal        @db.Decimal(10, 2)  // 充值金额
+  points      Int            // 对应积分
+  status      RechargeStatus @default(PENDING)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+}
+
+// 用户留言表
+model UserMessage {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  content     String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// 用户钱包
+model Wallet {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  balance   Decimal  @default(0) // 余额
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model RegisterOrder {
+  id          Int      @id @default(autoincrement()) // 主键
+  orderNo     String   @unique // 订单编号
+  phone       String   // 注册手机号
+  nickname    String   // 注册昵称
+  amount      Decimal  @db.Decimal(10, 2) // 订单金额
+  status      String   // 订单状态（如PENDING, PAID, CANCELLED等，可后续用enum优化）
+  paymentNo   String?  // 支付平台交易号
+  paymentTime DateTime? // 支付时间
+  remark      String?  // 备注
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  password    String?  // 注册密码
+}
+
+
+
+

@@ -1,0 +1,20 @@
+---
+description: 使用最新的react技术栈
+globs: 
+---
+- 
+# Your rule content
+
+- 阅读README.md
+- 使用umijs/max 开发
+- 使用UI组件,从@ant-design/pro-components里或者antd 框架中选择
+- 页面能按照功能分组件就分组件,不要功能都在一个页面里完成
+- 创建页面后,自动在.cursorrules里添加路由配置
+- 页面文件夹,首字母大写
+- CSS样式优先使用tailwindcss
+- 对接的后端接口,返回的json数据中的code默认为200是成功的,不是0
+- 使用typescript开发
+- 使用英文输出回答,因为我想学英语,所以输出一定要是英文
+- 但是注释使用中文,尽量多写中文注释
+
+

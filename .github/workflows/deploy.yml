@@ -1,0 +1,102 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ dev/wangzhiqiang ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      
+    # 添加安装 docker-compose 的步骤
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update && \
+        sudo apt-get install -y docker-compose && \
+        docker-compose --version
+      
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    # 登录阿里云容器镜像服务
+    - name: Login to Aliyun Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: crpi-z98u9yk12bkwzmsd.cn-shanghai.personal.cr.aliyuncs.com
+        username: ${{ secrets.ALIYUN_USERNAME }}
+        password: ${{ secrets.ALIYUN_PASSWORD }}
+        
+    - name: Build and push Docker images
+      run: |
+        # Build and push directly with the correct tag
+        docker-compose build web 
+        docker-compose push web 
+        
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+    - name: Add Known Hosts
+      env:
+        SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+        # 添加调试信息
+        ssh -v -i ~/.ssh/id_rsa ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "echo 'SSH connection test'"
+        
+    - name: Deploy to Server
+      env:
+        SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      run: |
+        # 复制必要文件到服务器
+        ssh $SERVER_USER@$SERVER_HOST "mkdir -p $DEPLOY_PATH/data"
+        scp docker-compose.yml nginx.conf $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH
+        # scp -r data/* $SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/data/
+        
+        # 在服务器上执行部署命令
+        ssh $SERVER_USER@$SERVER_HOST "cd $DEPLOY_PATH && \
+          echo 'Configuring Docker...' && \
+          mkdir -p /etc/docker && \
+          echo '{\"registry-mirrors\": [\"https://rub8h2x0.mirror.aliyuncs.com\"]}' | tee /etc/docker/daemon.json && \
+          echo 'Restarting Docker service...' && \
+          if systemctl list-units --type=service | grep -q docker.service; then \
+            sudo systemctl restart docker; \
+          else \
+            echo 'Docker service not found, skipping restart.'; \
+          fi && \
+          echo 'Docker status:' && \
+          systemctl status docker && \
+          echo 'Logging into Aliyun registry...' && \
+          echo '${{ secrets.ALIYUN_PASSWORD }}' | docker login --username ${{ secrets.ALIYUN_USERNAME }} --password-stdin crpi-z98u9yk12bkwzmsd.cn-shanghai.personal.cr.aliyuncs.com && \
+          echo 'Pulling images...' && \
+          DOCKER_CLIENT_TIMEOUT=300 \
+          COMPOSE_HTTP_TIMEOUT=300 \
+          sudo docker compose pull && \
+          echo 'Stopping specific containers...' && \
+          if [ "$(docker ps -q -f name=stars_web-web-1)" ]; then
+              docker stop stars_web-web-1
+              docker rm stars_web-web-1
+          else
+              echo "Container stars_web-web-1 does not exist, skipping stop."
+          fi && \
+          echo 'Starting new containers...' && \
+          docker compose up -d && \
+          
+          echo 'Container status:' && \
+          docker ps -a && \
+          echo 'Container logs:' && \
+          docker compose logs"
