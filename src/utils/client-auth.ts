@@ -11,6 +11,8 @@ interface UserInfo {
   createdAt?: string;
   updatedAt?: string;
   lastLoginAt?: string;
+  points?: number;
+  studyTime?: number;
 }
 
 // Cookie 配置

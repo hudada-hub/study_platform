@@ -27,6 +27,8 @@ export async function GET(req: NextRequest) {
         updatedAt: true,
         lastLoginAt: true,
         role: true,
+        points:true,
+        studyTime:true
       }
     });
 

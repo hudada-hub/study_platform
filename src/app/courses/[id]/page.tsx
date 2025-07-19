@@ -10,9 +10,10 @@ import { useParams, useRouter } from 'next/navigation';
 import { getUserAuth } from '@/utils/client-auth';
 import { CommentSection } from './CommentSection';
 import { RatingForm } from './components/RatingForm';
-import Link from 'antd/es/typography/Link';
+import Link from 'next/link';
 import { learningAnalytics, setupPageVisibilityTracking } from '@/utils/analytics';
 import { LearningProgress } from '@/components/common/LearningProgress';
+import { ChapterList } from './components/ChapterList';
 
 interface CourseDetail {
   id: number;
@@ -93,75 +94,10 @@ const PaymentRequired = ({ points, onPay }: { points: number; onPay: () => void 
   );
 };
 
-// 课程章节组件
-const ChapterList = ({ 
-  chapters, 
-  selectedChapter, 
-  onChapterClick,
-  chapterProgress
-}: { 
-  chapters: ChapterDetail[],
-  selectedChapter: ChapterDetail | null,
-  onChapterClick: (chapter: ChapterDetail) => void,
-  chapterProgress: { [key: number]: number }
-}) => {
-  return (
-    <div className="h-full overflow-y-auto">
-      {chapters.map((chapter) => (
-        <div key={chapter.id} className="mb-4">
-          <div className="flex items-center gap-2 text-gray-700 mb-2">
-            <FiBook className="text-lg" />
-            <span className="font-medium">{chapter.title}</span>
-          </div>
-          <div className="space-y-1">
-            {chapter.children?.map((subChapter) => {
-              const progress = chapterProgress[subChapter.id] || 0;
-              return (
-                <div
-                  key={subChapter.id}
-                  className={`flex items-center justify-between p-3 rounded cursor-pointer transition-colors
-                    ${selectedChapter?.id === subChapter.id 
-                      ? 'bg-orange-50 text-orange-500' 
-                      : 'hover:bg-gray-50'}`}
-                  onClick={() => onChapterClick(subChapter)}
-                >
-                  <div className="flex items-center gap-2 flex-1">
-                    <span className="text-sm">{subChapter.title}</span>
-                    {subChapter.duration && (
-                      <span className="text-xs text-gray-400">{Math.floor(subChapter.duration / 60)}分钟</span>
-                    )}
-                    {/* 学习进度指示器 */}
-                    {progress > 0 && (
-                      <div className="flex items-center gap-1">
-                        <div className="w-16 h-1 bg-gray-200 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-orange-500 rounded-full transition-all duration-300"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                        <span className="text-xs text-gray-500">{Math.round(progress)}%</span>
-                      </div>
-                    )}
-                  </div>
-                  {subChapter.points > 0 && (
-                    <span className="text-xs px-2 py-1 bg-orange-50 text-orange-500 rounded ml-2">
-                      {subChapter.points}积分
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 // 面包屑组件
 const Breadcrumb = ({ category, courseTitle }: { category: string; courseTitle: string }) => (
   <nav className="text-sm text-gray-500 mb-2 flex items-center gap-2">
-    <Link href="/courses">学习课程</Link>
+    <Link href="/courses" className="text-gray-500 hover:text-gray-700">学习课程</Link>
     <span className="mx-1">&gt;</span>
     <span>{category}</span>
     <span className="mx-1">&gt;</span>
@@ -180,7 +116,7 @@ const CoursePage = () => {
   const [hasPurchased, setHasPurchased] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
-  const [activeTab, setActiveTab] = useState('introduction'); // 新增：当前激活的选项卡
+  const [activeTab, setActiveTab] = useState('catalog'); // 新增：当前激活的选项卡
   const [chapterProgress, setChapterProgress] = useState<{ [key: number]: number }>({}); // 新增：章节进度状态
   const [userId, setUserId] = useState<number | null>(null);
 
@@ -604,7 +540,7 @@ const CoursePage = () => {
           <div className="flex border-b border-gray-200 mb-4 sm:mb-6 overflow-x-auto">
             <button
               onClick={() => setActiveTab('introduction')}
-              className={`px-6 py-3 text-sm transition-colors relative ${
+              className={`px-2 md:px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'introduction'
                   ? 'text-orange-500'
                   : 'text-gray-400 '
@@ -617,7 +553,7 @@ const CoursePage = () => {
             </button>
             <button
               onClick={() => setActiveTab('rating')}
-              className={`px-6 py-3 text-sm transition-colors relative ${
+              className={`px-2 md:px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'rating'
                   ? 'text-orange-500'
                   : 'text-gray-400 '
@@ -630,7 +566,7 @@ const CoursePage = () => {
             </button>
             <button
               onClick={() => setActiveTab('comments')}
-              className={`px-6 py-3 text-sm transition-colors relative ${
+              className={`px-2 md:px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'comments'
                   ? 'text-orange-500'
                   : 'text-gray-400 '
@@ -643,7 +579,7 @@ const CoursePage = () => {
             </button>
             <button
               onClick={() => setActiveTab('catalog')}
-              className={`px-6 py-3 text-sm transition-colors relative ${
+              className={`px-2 md:px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'catalog'
                   ? 'text-orange-500'
                   : 'text-gray-400 '
@@ -654,19 +590,7 @@ const CoursePage = () => {
                 <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500"></div>
               )}
             </button>
-            <button
-              onClick={() => setActiveTab('stats')}
-              className={`px-6 py-3 text-sm transition-colors relative ${
-                activeTab === 'stats'
-                  ? 'text-orange-500'
-                  : 'text-gray-400 '
-              }`}
-            >
-              学习统计
-              {activeTab === 'stats' && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500"></div>
-              )}
-            </button>
+          
           </div>
 
           {/* 选项卡内容 */}

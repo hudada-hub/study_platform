@@ -23,7 +23,25 @@ export async function GET(
       },
     });
 
-    return ResponseUtil.success(order);
+    if (order) {
+      // 如果找到订单，获取章节信息
+      const chapter = await prisma.courseChapter.findUnique({
+        where: {
+          id: Number(params.chapterId),
+          courseId: Number(params.id),
+        },
+        select: {
+          videoUrl: true,
+        },
+      });
+
+      return ResponseUtil.success({
+        ...order,
+        videoUrl: chapter?.videoUrl,
+      });
+    }
+
+    return ResponseUtil.success(null);
   } catch (error) {
     console.error('查询课程章节订单失败:', error);
     return ResponseUtil.serverError('查询订单失败');
@@ -41,7 +59,7 @@ export async function POST(
       return ResponseUtil.unauthorized('未登录');
     }
 
-      const { id, chapterId } = await params;
+    const { id, chapterId } = await params;
     const courseId = parseInt(id);
 
     // 开启事务
@@ -73,12 +91,15 @@ export async function POST(
         where: {
           userId: user.id,
           courseId,
-          chapterId:parseInt(chapterId),
+          chapterId: parseInt(chapterId),
         },
       });
 
       if (existingOrder) {
-        return existingOrder;
+        return {
+          ...existingOrder,
+          videoUrl: chapter.videoUrl,
+        };
       }
 
       // 扣除用户积分
@@ -96,12 +117,15 @@ export async function POST(
         data: {
           userId: user.id,
           courseId,
-          chapterId:parseInt(chapterId),
+          chapterId: parseInt(chapterId),
           points: chapter.points,
         },
       });
 
-      return order;
+      return {
+        ...order,
+        videoUrl: chapter.videoUrl,
+      };
     });
 
     return ResponseUtil.success(result);

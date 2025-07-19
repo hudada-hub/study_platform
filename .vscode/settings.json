@@ -78,5 +78,10 @@
   // 路径别名提示
   "path-intellisense.mappings": {
     "@": "${workspaceFolder}/src"
-  }
+  },
+  "http.proxy": "http://127.0.0.1:7890",
+  "http.proxyStrictSSL": false,
+  "http.noProxy":[],
+  "http.proxySupport": "override",
+  "cursor.general.disableHttp2": true
 } 

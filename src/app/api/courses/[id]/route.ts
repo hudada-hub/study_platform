@@ -27,10 +27,26 @@ export async function GET(
           orderBy: {
             sort: 'asc',
           },
-          include: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            points: true,
+            duration: true,
+            sort: true,
+            coverUrl: true, 
             children: {
               orderBy: {
                 sort: 'asc',
+              },
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                points: true,
+                duration: true,
+                sort: true,
+                coverUrl: true,
               },
             },
           },
