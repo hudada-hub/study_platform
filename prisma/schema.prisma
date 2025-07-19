@@ -128,6 +128,7 @@ model User {
   rechargeRecords  RechargeRecord[]  // 充值记录
   messages         UserMessage[]      // 用户留言
   wallet           Wallet?
+  learningEvents   LearningEvent[]   // 学习行为记录
 
   // 课程章节上传
   uploadedChapters CourseChapter[]
@@ -454,6 +455,7 @@ model Course {
   ratings        CourseRating[]
   likes          CourseLike[]
   favorites      CourseFavorite[]
+  learningEvents LearningEvent[]
   uploader       User           @relation(fields: [uploaderId], references: [id])
   uploaderId     Int
 
@@ -486,6 +488,7 @@ model CourseChapter {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   orders      CourseOrder[] // 添加反向关系
+  learningEvents LearningEvent[] // 学习行为记录
   coverUrl    String? @db.VarChar(500)
 
   @@index([courseId])
@@ -978,6 +981,27 @@ model RegisterOrder {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   password    String?  // 注册密码
+}
+
+// 学习行为记录表
+model LearningEvent {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  courseId  Int
+  chapterId Int
+  eventType String   // 事件类型
+  timestamp DateTime @default(now())
+  data      String?  @db.Text // 事件数据（JSON格式）
+  
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+  chapter   CourseChapter @relation(fields: [chapterId], references: [id])
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([chapterId])
+  @@index([eventType])
+  @@index([timestamp])
 }
 
 

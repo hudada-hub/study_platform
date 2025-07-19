@@ -5,12 +5,14 @@ import { request } from '@/utils/request';
 import { FiClock, FiStar, FiUsers, FiBook, FiLock, FiCreditCard, FiHeart, FiThumbsUp } from 'react-icons/fi';
 
 import Swal from 'sweetalert2';
-import { CosVideoWatermark } from '@/components/common/CosVideoWatermark';
+import { CosVideoWithProgress } from '@/components/common/CosVideoWithProgress';
 import { useParams, useRouter } from 'next/navigation';
 import { getUserAuth } from '@/utils/client-auth';
 import { CommentSection } from './CommentSection';
 import { RatingForm } from './components/RatingForm';
 import Link from 'antd/es/typography/Link';
+import { learningAnalytics, setupPageVisibilityTracking } from '@/utils/analytics';
+import { LearningProgress } from '@/components/common/LearningProgress';
 
 interface CourseDetail {
   id: number;
@@ -44,6 +46,7 @@ interface ChapterDetail {
   points: number;
   duration: number | null;
   children: ChapterDetail[];
+  progress?: number; // 新增：学习进度
 }
 
 interface LikeResponse {
@@ -94,11 +97,13 @@ const PaymentRequired = ({ points, onPay }: { points: number; onPay: () => void 
 const ChapterList = ({ 
   chapters, 
   selectedChapter, 
-  onChapterClick 
+  onChapterClick,
+  chapterProgress
 }: { 
   chapters: ChapterDetail[],
   selectedChapter: ChapterDetail | null,
-  onChapterClick: (chapter: ChapterDetail) => void
+  onChapterClick: (chapter: ChapterDetail) => void,
+  chapterProgress: { [key: number]: number }
 }) => {
   return (
     <div className="h-full overflow-y-auto">
@@ -109,28 +114,43 @@ const ChapterList = ({
             <span className="font-medium">{chapter.title}</span>
           </div>
           <div className="space-y-1">
-            {chapter.children?.map((subChapter) => (
-              <div
-                key={subChapter.id}
-                className={`flex items-center justify-between p-3 rounded cursor-pointer transition-colors
-                  ${selectedChapter?.id === subChapter.id 
-                    ? 'bg-orange-50 text-orange-500' 
-                    : 'hover:bg-gray-50'}`}
-                onClick={() => onChapterClick(subChapter)}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">{subChapter.title}</span>
-                  {subChapter.duration && (
-                    <span className="text-xs text-gray-400">{Math.floor(subChapter.duration / 60)}分钟</span>
+            {chapter.children?.map((subChapter) => {
+              const progress = chapterProgress[subChapter.id] || 0;
+              return (
+                <div
+                  key={subChapter.id}
+                  className={`flex items-center justify-between p-3 rounded cursor-pointer transition-colors
+                    ${selectedChapter?.id === subChapter.id 
+                      ? 'bg-orange-50 text-orange-500' 
+                      : 'hover:bg-gray-50'}`}
+                  onClick={() => onChapterClick(subChapter)}
+                >
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="text-sm">{subChapter.title}</span>
+                    {subChapter.duration && (
+                      <span className="text-xs text-gray-400">{Math.floor(subChapter.duration / 60)}分钟</span>
+                    )}
+                    {/* 学习进度指示器 */}
+                    {progress > 0 && (
+                      <div className="flex items-center gap-1">
+                        <div className="w-16 h-1 bg-gray-200 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-orange-500 rounded-full transition-all duration-300"
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-500">{Math.round(progress)}%</span>
+                      </div>
+                    )}
+                  </div>
+                  {subChapter.points > 0 && (
+                    <span className="text-xs px-2 py-1 bg-orange-50 text-orange-500 rounded ml-2">
+                      {subChapter.points}积分
+                    </span>
                   )}
                 </div>
-                {subChapter.points > 0 && (
-                  <span className="text-xs px-2 py-1 bg-orange-50 text-orange-500 rounded">
-                    {subChapter.points}积分
-                  </span>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ))}
@@ -161,17 +181,21 @@ const CoursePage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [activeTab, setActiveTab] = useState('introduction'); // 新增：当前激活的选项卡
+  const [chapterProgress, setChapterProgress] = useState<{ [key: number]: number }>({}); // 新增：章节进度状态
+  const [userId, setUserId] = useState<number | null>(null);
 
   // 检查登录状态
   useEffect(() => {
-    const {token} = getUserAuth();
+    const {token, userInfo} = getUserAuth();
     setIsLoggedIn(!!token);
+    setUserId(userInfo?.id || null);
   }, []);
 
-  // 检查购买状态
+  // 检查购买状态和学习进度
   useEffect(() => {
     if (selectedChapter && isLoggedIn) {
       checkPurchaseStatus();
+      fetchChapterProgress();
     }
   }, [selectedChapter, isLoggedIn]);
 
@@ -187,6 +211,25 @@ const CoursePage = () => {
     } catch (error) {
       console.error('检查购买状态失败:', error);
       setHasPurchased(false);
+    }
+  };
+
+  // 获取章节学习进度
+  const fetchChapterProgress = async () => {
+    if (!selectedChapter) return;
+    try {
+      const progressRes = await request<{ progress: number; hasPurchased: boolean }>(`/courses/${params.id}/chapters/${selectedChapter.id}/progress`, {
+        method: 'GET'
+      });
+      
+      if (progressRes.code === 0 && progressRes.data) {
+        setChapterProgress(prev => ({
+          ...prev,
+          [selectedChapter.id]: progressRes.data.progress
+        }));
+      }
+    } catch (error) {
+      console.error('获取学习进度失败:', error);
     }
   };
 
@@ -288,9 +331,64 @@ const CoursePage = () => {
       try {
         const response = await request<CourseDetail>(`/courses/${params.id}`);
         if (response.code === 0 && response.data) {
-        setCourse(response.data);
+          setCourse(response.data);
           setIsLiked(response.data.isLiked || false);
           setIsFavorited(response.data.isFavorited || false);
+
+          // 如果用户已登录，获取学习记录
+          if (isLoggedIn) {
+            try {
+              // 获取用户在该课程的学习记录
+              const learningResponse = await request<{ events: any[] }>(`/analytics/learning-events?courseId=${params.id}`);
+              
+              if (learningResponse.code === 0 && learningResponse.data?.events?.length > 0) {
+                // 按时间倒序排序，获取最近学习的章节
+                const lastEvent = learningResponse.data.events[0];
+                const lastChapterId = lastEvent.chapterId;
+                
+                // 在课程章节中找到对应章节
+                const findChapter = (chapters: ChapterDetail[]): ChapterDetail | null => {
+                  for (const chapter of chapters) {
+                    if (chapter.children) {
+                      for (const subChapter of chapter.children) {
+                        if (subChapter.id === lastChapterId) {
+                          return subChapter;
+                        }
+                      }
+                    }
+                  }
+                  return null;
+                };
+
+                const lastChapter = findChapter(response.data.chapters);
+                if (lastChapter) {
+                  setSelectedChapter(lastChapter);
+                  return;
+                }
+              }
+            } catch (error) {
+              console.error('获取学习记录失败:', error);
+            }
+          }
+
+          // 如果没有学习记录或获取失败，选择第一个有视频的章节
+          const findFirstVideoChapter = (chapters: ChapterDetail[]): ChapterDetail | null => {
+            for (const chapter of chapters) {
+              if (chapter.children) {
+                for (const subChapter of chapter.children) {
+                  if (subChapter.videoUrl) {
+                    return subChapter;
+                  }
+                }
+              }
+            }
+            return null;
+          };
+
+          const firstChapter = findFirstVideoChapter(response.data.chapters);
+          if (firstChapter) {
+            setSelectedChapter(firstChapter);
+          }
         }
       } catch (error) {
         console.error('获取课程详情失败:', error);
@@ -300,7 +398,30 @@ const CoursePage = () => {
     };
 
     fetchCourseDetail();
-  }, [params.id]);
+  }, [params.id, isLoggedIn]);
+
+  // 设置页面可见性跟踪和学习行为埋点
+  useEffect(() => {
+    if (isLoggedIn && userId && course) {
+      // 记录进入课程事件
+      learningAnalytics.trackCourseEnter(parseInt(params.id as string), userId, {
+        deviceInfo: learningAnalytics.getDeviceInfo(),
+        userAgent: navigator.userAgent,
+      });
+
+      // 设置页面可见性跟踪
+      const cleanup = setupPageVisibilityTracking(parseInt(params.id as string), userId);
+
+      return () => {
+        cleanup();
+        // 记录离开课程事件
+        learningAnalytics.trackCourseLeave(parseInt(params.id as string), userId, {
+          deviceInfo: learningAnalytics.getDeviceInfo(),
+          userAgent: navigator.userAgent,
+        });
+      };
+    }
+  }, [isLoggedIn, userId, course, params.id]);
 
   // 处理章节点击
   const handleChapterClick = async (chapter: ChapterDetail) => {
@@ -311,6 +432,14 @@ const CoursePage = () => {
 
       if (orderRes.code === 0 ) {
         setSelectedChapter(chapter);
+        
+        // 记录章节选择事件
+        if (userId) {
+          learningAnalytics.trackChapterSelect(parseInt(params.id as string), chapter.id, userId, {
+            deviceInfo: learningAnalytics.getDeviceInfo(),
+            userAgent: navigator.userAgent,
+          });
+        }
         return;
       }
 
@@ -347,11 +476,19 @@ const CoursePage = () => {
         //       title: '购买失败',
         //       text: error.message || '积分不足或发生其他错误',
         //       icon: 'error'
-        //     });
+        //       });
         //   }
         // }
       } else {
         setSelectedChapter(chapter);
+        
+        // 记录章节选择事件
+        if (userId) {
+          learningAnalytics.trackChapterSelect(parseInt(params.id as string), chapter.id, userId, {
+            deviceInfo: learningAnalytics.getDeviceInfo(),
+            userAgent: navigator.userAgent,
+          });
+        }
       }
     } catch (error: any) {
       console.error('处理章节点击失败:', error);
@@ -360,6 +497,16 @@ const CoursePage = () => {
         text: error.message || '请稍后重试',
         icon: 'error'
       });
+    }
+  };
+
+  // 处理进度更新
+  const handleProgressUpdate = (progress: number) => {
+    if (selectedChapter) {
+      setChapterProgress(prev => ({
+        ...prev,
+        [selectedChapter.id]: progress
+      }));
     }
   };
 
@@ -389,12 +536,17 @@ const CoursePage = () => {
               <PaymentRequired points={selectedChapter.points} onPay={handlePay} />
             )}
               {selectedChapter?.videoUrl ? (
-                  <CosVideoWatermark
-                  path={selectedChapter.videoUrl}
-                  controls
-                  controlsList="nodownload"
-                  className="w-full h-full"
-                />
+                  <CosVideoWithProgress
+                    path={selectedChapter.videoUrl}
+                    courseId={parseInt(params.id as string)}
+                    chapterId={selectedChapter.id}
+                    userId={userId || 0}
+                    onProgressUpdate={handleProgressUpdate}
+                    initialProgress={chapterProgress[selectedChapter.id] || 0}
+                    controls
+                    controlsList="nodownload"
+                    className="w-full h-full"
+                  />
               ) : (
               <div className="w-full h-full flex items-center justify-center bg-zinc-950  text-zinc-50">
                 请选择要播放的视频
@@ -502,6 +654,19 @@ const CoursePage = () => {
                 <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500"></div>
               )}
             </button>
+            <button
+              onClick={() => setActiveTab('stats')}
+              className={`px-6 py-3 text-sm transition-colors relative ${
+                activeTab === 'stats'
+                  ? 'text-orange-500'
+                  : 'text-gray-400 '
+              }`}
+            >
+              学习统计
+              {activeTab === 'stats' && (
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500"></div>
+              )}
+            </button>
           </div>
 
           {/* 选项卡内容 */}
@@ -532,6 +697,14 @@ const CoursePage = () => {
                 <RatingForm courseId={parseInt(params.id as string)} />
               </div>
             )}
+            {activeTab === 'stats' && isLoggedIn && (
+              <div className="bg-white rounded p-4 sm:p-6 shadow-sm">
+                <LearningProgress 
+                  courseId={parseInt(params.id as string)}
+                  chapterId={selectedChapter?.id}
+                />
+              </div>
+            )}
             {activeTab === 'comments' && (
               <div className="bg-white rounded p-4 sm:p-6 shadow-sm">
                 <CommentSection courseId={parseInt(params.id as string)} />
@@ -543,6 +716,7 @@ const CoursePage = () => {
                   chapters={course.chapters}
                   selectedChapter={selectedChapter}
                   onChapterClick={handleChapterClick}
+                  chapterProgress={chapterProgress}
                 />
               </div>
             )}
@@ -558,6 +732,7 @@ const CoursePage = () => {
             chapters={course.chapters}
             selectedChapter={selectedChapter}
             onChapterClick={handleChapterClick}
+            chapterProgress={chapterProgress}
           />
         </div>
       </div>
