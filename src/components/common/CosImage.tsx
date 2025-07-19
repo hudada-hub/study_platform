@@ -53,7 +53,7 @@ export const CosImage: FC<CosImageProps> = ({ path, ...props }) => {
     // 每隔1小时刷新一次URL（避免URL过期）
     const timer = setInterval(refreshUrl, 60 * 60 * 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [path]);
 
   if (loading) {
     return <div className="text-gray-500">加载中...</div>;

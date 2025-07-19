@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { request } from '@/utils/request';
 import { FiClock, FiStar, FiUsers, FiBook, FiLock, FiCreditCard, FiHeart, FiThumbsUp } from 'react-icons/fi';
+import { CosImage } from '@/components/common/CosImage';
 
 import Swal from 'sweetalert2';
 import { CosVideoWithProgress } from '@/components/common/CosVideoWithProgress';
@@ -48,6 +49,7 @@ interface ChapterDetail {
   duration: number | null;
   children: ChapterDetail[];
   progress?: number; // 新增：学习进度
+  coverUrl: string | null;
 }
 
 interface LikeResponse {
@@ -77,19 +79,36 @@ const LoginRequired = () => {
 };
 
 // 支付提示组件
-const PaymentRequired = ({ points, onPay }: { points: number; onPay: () => void }) => {
+const PaymentRequired = ({ points, onPay, coverUrl }: { points: number; onPay: () => void; coverUrl: string }) => {
   return (
-    <div className="absolute inset-0 bg-black/80 backdrop-blur flex flex-col items-center justify-center text-center z-10">
-      <FiCreditCard className="text-4xl text-orange-500 mb-4" />
-      <h3 className="text-xl mb-2">本节课程需要支付积分</h3>
-      <p className="text-gray-400 mb-2">需要支付 {points} 积分才能观看</p>
-      <p className="text-gray-400 mb-6">*支付后可永久观看</p>
-      <button
-        onClick={onPay}
-        className="px-8 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
-      >
-        立即支付 {points} 积分
-      </button>
+    <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10">
+      {/* 背景图片 */}
+      <div className="absolute inset-0">
+      
+  
+        <CosImage
+          path={coverUrl}
+          width={1920}
+          height={1080}
+          className="w-full h-full object-cover"
+        />
+        {/* 遮罩层 */}
+        <div className="absolute inset-0 bg-black/60 "></div>
+      </div>
+
+      {/* 内容 */}
+      <div className="relative z-10">
+        <FiCreditCard className="text-4xl text-orange-500 mb-4" />
+        <h3 className="text-xl mb-2 text-white">本节课程需要支付积分  </h3>
+        <p className="text-gray-200 mb-2">需要支付 {points} 积分才能观看</p>
+        <p className="text-gray-300 mb-6">*支付后可永久观看</p>
+        <button
+          onClick={onPay}
+          className="px-8 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+        >
+          立即支付 {points} 积分
+        </button>
+      </div>
     </div>
   );
 };
@@ -119,6 +138,8 @@ const CoursePage = () => {
   const [activeTab, setActiveTab] = useState('catalog'); // 新增：当前激活的选项卡
   const [chapterProgress, setChapterProgress] = useState<{ [key: number]: number }>({}); // 新增：章节进度状态
   const [userId, setUserId] = useState<number | null>(null);
+  const [chapterVideoUrl, setChapterVideoUrl] = useState<string | null>(null);
+  const [selectedChapterCoverUrl, setSelectedChapterCoverUrl] = useState<string | null>(null);
 
   // 检查登录状态
   useEffect(() => {
@@ -139,14 +160,21 @@ const CoursePage = () => {
   const checkPurchaseStatus = async () => {
     if (!selectedChapter) return;
     try {
-      const orderRes = await request<{ hasPurchased: boolean }>(`/courses/${params.id}/chapters/${selectedChapter.id}/order`, {
+      const orderRes = await request<{ hasPurchased: boolean; videoUrl?: string }>(`/courses/${params.id}/chapters/${selectedChapter.id}/order`, {
         method: 'GET'
       });
       console.log(orderRes);
-      setHasPurchased(orderRes.code === 0 && orderRes.data!=null);
+      if (orderRes.code === 0 && orderRes.data) {
+        setHasPurchased(true);
+        setChapterVideoUrl(orderRes.data.videoUrl || null);
+      } else {
+        setHasPurchased(false);
+        setChapterVideoUrl(null);
+      }
     } catch (error) {
       console.error('检查购买状态失败:', error);
       setHasPurchased(false);
+      setChapterVideoUrl(null);
     }
   };
 
@@ -173,12 +201,13 @@ const CoursePage = () => {
   const handlePay = async () => {
     if (!selectedChapter) return;
     try {
-      const createOrderRes = await request(`/courses/${params.id}/chapters/${selectedChapter.id}/order`, {
+      const createOrderRes = await request<{ videoUrl: string }>(`/courses/${params.id}/chapters/${selectedChapter.id}/order`, {
         method: 'POST'
       });
 
       if (createOrderRes.code === 0) {
         setHasPurchased(true);
+        setChapterVideoUrl(createOrderRes.data?.videoUrl || null);
       } else {
         throw new Error(createOrderRes.message);
       }
@@ -361,13 +390,18 @@ const CoursePage = () => {
 
   // 处理章节点击
   const handleChapterClick = async (chapter: ChapterDetail) => {
+    console.log(chapter,'chapter')
+    setSelectedChapter(chapter);
+    setSelectedChapterCoverUrl(chapter.coverUrl || '');
+    setChapterVideoUrl(null); // 重置视频URL
     try {
+
       const orderRes = await request(`/courses/${params.id}/chapters/${chapter.id}/order`, {
         method: 'GET'
       });
 
-      if (orderRes.code === 0 ) {
-        setSelectedChapter(chapter);
+      if (orderRes.code === 0 && orderRes.data) {
+        setChapterVideoUrl((orderRes.data as any)?.videoUrl || null);
         
         // 记录章节选择事件
         if (userId) {
@@ -380,43 +414,8 @@ const CoursePage = () => {
       }
 
       if (chapter.points > 0) {
-        // const result = await Swal.fire({
-        //   title: '需要积分',
-        //   text: `观看本视频需要 ${chapter.points} 积分，是否确认观看？`,
-        //   icon: 'warning',
-        //   showCancelButton: true,
-        //   confirmButtonText: '确认观看',
-        //   cancelButtonText: '取消'
-        // });
-
-        // if (result.isConfirmed) {
-        //   try {
-        //     const createOrderRes = await request(`/courses/${params.id}/chapters/${chapter.id}/order`, {
-        //       method: 'POST'
-        //     });
-
-        //     if (createOrderRes.code === 0) {
-        //       setSelectedChapter(chapter);
-        //       Swal.fire({
-        //         title: '购买成功',
-        //         text: '已成功使用积分购买本章节',
-        //         icon: 'success',
-        //         timer: 1500,
-        //         showConfirmButton: false
-        //       });
-        //     } else {
-        //       throw new Error(createOrderRes.message);
-        //     }
-        //   } catch (error: any) {
-        //     Swal.fire({
-        //       title: '购买失败',
-        //       text: error.message || '积分不足或发生其他错误',
-        //       icon: 'error'
-        //       });
-        //   }
-        // }
-      } else {
         setSelectedChapter(chapter);
+      } else {
         
         // 记录章节选择事件
         if (userId) {
@@ -464,16 +463,17 @@ const CoursePage = () => {
       </div>
       {/* 主要内容区域 */}
       <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+       
         {/* 左侧：视频播放和选项卡内容 */}
         <div className="flex-1">
           <div className="bg-white rounded-lg overflow-hidden aspect-video mb-4 sm:mb-6 relative shadow-sm">
             {!isLoggedIn && <LoginRequired />}
             {isLoggedIn && selectedChapter && selectedChapter.points > 0 && !hasPurchased && (
-              <PaymentRequired points={selectedChapter.points} onPay={handlePay} />
+              <PaymentRequired points={selectedChapter.points} onPay={handlePay} coverUrl={selectedChapterCoverUrl || ''} />
             )}
-              {selectedChapter?.videoUrl ? (
+             {chapterVideoUrl && selectedChapter ? (
                   <CosVideoWithProgress
-                    path={selectedChapter.videoUrl}
+                   path={chapterVideoUrl}
                     courseId={parseInt(params.id as string)}
                     chapterId={selectedChapter.id}
                     userId={userId || 0}
@@ -484,9 +484,21 @@ const CoursePage = () => {
                     className="w-full h-full"
                   />
               ) : (
-              <div className="w-full h-full flex items-center justify-center bg-zinc-950  text-zinc-50">
-                请选择要播放的视频
-                </div>
+             <div 
+               className="w-full h-full bg-center bg-cover bg-no-repeat flex items-center justify-center"
+               style={{ 
+                 backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${course.coverUrl})` 
+               }}
+             >
+               <div className="text-white text-center">
+                 <h3 className="text-xl mb-2">{selectedChapter ? selectedChapter.title : '请选择要播放的视频'}</h3>
+                 {selectedChapter && (
+                   <p className="text-sm text-gray-300">
+                     {selectedChapter.duration ? `时长：${Math.ceil(selectedChapter.duration / 60)}分钟` : ''}
+                   </p>
+                 )}
+               </div>
+             </div>
               )}
 
 

@@ -7,10 +7,160 @@ import Swal from 'sweetalert2';
 import { CosVideo } from '@/components/common/CosVideo';
 import VideoCoverCapture from '@/components/common/VideoCoverCapture';
 import VideoMultiCoverCapture, { MultiCover } from '@/components/common/VideoMultiCoverCapture';
+import { FaUpload, FaSpinner, FaImage, FaTimes } from 'react-icons/fa';
+import Image from 'next/image';
+import { getToken } from '@/utils/request';
+import { CosImage } from '@/components/common/CosImage';
 
 const VIDEO_ACCEPTED_TYPES = [
   'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv', 'video/webm', 'video/ogg',
 ];
+
+// 自定义图片上传组件
+interface CustomImageUploaderProps {
+  value?: string;
+  onChange: (url: string) => void;
+  className?: string;
+  placeholder?: string;
+}
+
+const CustomImageUploader: React.FC<CustomImageUploaderProps> = ({
+  value,
+  onChange,
+  className = '',
+  placeholder = '点击或拖拽上传封面图片'
+}) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleUpload = async (file: File) => {
+    try {
+      setError('');
+      setIsUploading(true);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'image');
+
+      const response = await fetch('/api/common/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+        }
+      });
+
+      const result = await response.json();
+      if (result.code === 0) {
+        onChange(result.data.url);
+      } else {
+        setError(result.message || '上传失败');
+      }
+    } catch (err) {
+      setError('上传失败，请重试');
+      console.error('上传失败:', err);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setError('请上传图片文件');
+        return;
+      }
+      handleUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setError('请上传图片文件');
+        return;
+      }
+      handleUpload(file);
+    }
+  };
+
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange('');
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      <div
+        className={`relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors
+          ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'}
+          ${error ? 'border-red-500' : ''}`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => document.getElementById('cover-upload')?.click()}
+      >
+        <input
+          id="cover-upload"
+          type="file"
+          className="hidden"
+          accept="image/*"
+          onChange={handleFileChange}
+        />
+
+        {isUploading ? (
+          <div className="flex flex-col items-center py-4">
+            <FaSpinner className="animate-spin text-2xl text-blue-500 mb-2" />
+            <span className="text-gray-600">上传中...</span>
+          </div>
+        ) : value ? (
+          <div className="relative group">
+            <div className="relative w-full aspect-video">
+              <CosImage
+                path={value}
+                width={500}
+                height={500}
+                className="object-cover rounded"
+              />
+            </div>
+            <button
+              onClick={handleRemove}
+              className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <FaTimes />
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center py-8">
+            <FaImage className="text-4xl text-gray-400 mb-2" />
+            <p className="text-gray-600">{placeholder}</p>
+            <p className="text-sm text-gray-500 mt-1">支持拖拽上传</p>
+          </div>
+        )}
+      </div>
+
+      {error && (
+        <p className="text-red-500 text-sm mt-1">{error}</p>
+      )}
+    </div>
+  );
+};
 interface ChapterModalProps {
   open: boolean;
   onCancel: () => void;
@@ -154,6 +304,9 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
     setEditingChapter(null);
     setSelectedParentId(null);
     setVideoUrl(''); // 重置视频URL
+    setCoverUrl(''); // 重置封面URL
+    setCoverCandidates([]); // 重置封面候选列表
+    setDuration(undefined); // 重置视频时长
     form.resetFields();
     setIsSubChapterModalOpen(true);
   };
@@ -164,6 +317,8 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
     setSelectedParentId(parentId);
     setVideoUrl(''); // 重置视频URL
     setCoverUrl(''); // 重置封面URL
+    setCoverCandidates([]); // 重置封面候选列表
+    setDuration(undefined); // 重置视频时长
     form.resetFields();
     setIsSubChapterModalOpen(true);
   };
@@ -240,6 +395,8 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
   const handleRemoveVideo = () => {
     setVideoUrl('');
     setCoverUrl(''); // 删除视频时同步清空封面
+    setCoverCandidates([]); // 删除视频时同步清空封面候选列表
+    setDuration(undefined); // 删除视频时同步清空视频时长
     form.setFieldValue('videoUrl', '');
   };
 
@@ -252,16 +409,17 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
         values.videoUrl = videoUrl.split('?q-sign-algorithm')[0];
       }
       
-      
+      if(coverUrl){
+        values.coverUrl = coverUrl.split('?q-sign-algorithm')[0];
+      }
       const data = {
         ...values,
         courseId,
         parentId: selectedParentId,
         duration:duration,
       };
-      if (coverUrl) {
-        data.coverUrl = coverUrl;
-      }
+      console.log(coverUrl,'coverUrl')
+     
       if (editingChapter) {
         await request(`/courses/${courseId}/chapters/${editingChapter.id}`, {
           method: 'PUT',
@@ -293,6 +451,8 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
   const handleModalClose = () => {
     setVideoUrl('');
     setCoverUrl(''); // 重置封面URL
+    setCoverCandidates([]); // 重置封面候选列表
+    setDuration(undefined); // 重置视频时长
     setIsSubChapterModalOpen(false);
     form.resetFields();
   };
@@ -511,38 +671,73 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                     />
                   </div>
                 )}
-              {/* 多帧候选封面选择 */}
-              {coverCandidates.length > 0 && (
-                <div className="flex items-center space-x-4 mt-2">
-                  {coverCandidates.map((item, idx) => (
-                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <img
-                        src={item.cosUrl}
-                        alt={`封面${idx+1}`}
-                        style={{
-                          width: 120,
-                          height: 68,
-                          objectFit: 'cover',
-                          borderRadius: 8,
-                          border: coverUrl === item.cosUrl ? '2px solid #1677ff' : '1px solid #eee',
-                          cursor: 'pointer',
-                          boxShadow: coverUrl === item.cosUrl ? '0 0 8px #1677ff55' : undefined
-                        }}
-                        onClick={() => setCoverUrl(item.cosUrl!)}
-                      />
-                      <span style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{Math.round(item.time)}s</span>
-                      {coverUrl === item.cosUrl && <span style={{ color: '#1677ff', fontSize: 12 }}>已选</span>}
+              {/* 封面选择区域 */}
+              <div className="mt-4">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">视频封面</h4>
+                
+                {/* 手动上传封面 */}
+                <div className="mb-4">
+                  <h5 className="text-xs text-gray-500 mb-2">手动上传封面</h5>
+                  <CustomImageUploader
+                    value={coverUrl}
+                    onChange={(value)=>{
+                      setCoverUrl(value.split('?q-sign-algorithm')[0])
+                    }}
+                    placeholder="点击或拖拽上传自定义封面"
+                  />
+                </div>
+
+                {/* 多帧候选封面选择 */}
+                {coverCandidates.length > 0 && (
+                  <div className="mb-4">
+                    <h5 className="text-xs text-gray-500 mb-2">自动抓取封面（点击选择）</h5>
+                    <div className="flex items-center space-x-4">
+                      {coverCandidates.map((item, idx) => (
+                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <img
+                            src={item.cosUrl}
+                            alt={`封面${idx+1}`}
+                            style={{
+                              width: 120,
+                              height: 68,
+                              objectFit: 'cover',
+                              borderRadius: 8,
+                              border: coverUrl === item.cosUrl ? '2px solid #1677ff' : '1px solid #eee',
+                              cursor: 'pointer',
+                              boxShadow: coverUrl === item.cosUrl ? '0 0 8px #1677ff55' : undefined
+                            }}
+                            onClick={() => setCoverUrl(item.cosUrl!)}
+                          />
+                          <span style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{Math.round(item.time)}s</span>
+                          {coverUrl === item.cosUrl && <span style={{ color: '#1677ff', fontSize: 12 }}>已选</span>}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
-              {/* 兼容单帧旧逻辑的预览与删除 */}
-              {coverUrl && coverCandidates.length === 0 && (
-                <div className="flex items-center space-x-4 mt-2">
-                  <img src={coverUrl} alt="视频封面" style={{ width: 120, height: 68, objectFit: 'cover', borderRadius: 8, border: '1px solid #eee' }} />
-                  <Button danger size="small" onClick={() => setCoverUrl('')}>删除封面</Button>
-                </div>
-              )}
+                  </div>
+                )}
+
+                {/* 当前选中的封面预览 */}
+                {coverUrl && (
+                  <div className="mt-2">
+                    <h5 className="text-xs text-gray-500 mb-2">当前选中封面</h5>
+                    <div className="flex items-center space-x-4">
+                      <CosImage  
+                        path={coverUrl} 
+                        width={120} 
+                        height={68} 
+                        className="object-cover rounded-lg"
+                      />
+                      <Button 
+                        danger 
+                        size="small" 
+                        onClick={() => setCoverUrl('')}
+                      >
+                        删除封面
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
               <VideoMultiCoverCapture
                 ref={multiCoverRef}
                 videoUrl={videoUrl}
