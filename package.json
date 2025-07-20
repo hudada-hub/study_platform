@@ -5,13 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "postinstall": "prisma generate",
-    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next build",
     "start": "next start",
     "lint": "next lint",
     "batch-add-courses": "tsx scripts/batchAddCourses.ts",
     "prisma": "prisma generate&&npx prisma db push",
-    "build:clean": "rm -rf .next && NODE_OPTIONS='--max-old-space-size=4096' next build",
-    "build:prod": "NODE_OPTIONS='--max-old-space-size=8192' next build"
+    "build:clean": "rimraf .next && cross-env NODE_OPTIONS=--max-old-space-size=4096 next build",
+    "build:prod": "cross-env NODE_OPTIONS=--max-old-space-size=8192 next build"
   },
   "dependencies": {
     "@antv/x6": "^2.18.1",
