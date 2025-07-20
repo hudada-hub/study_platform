@@ -560,9 +560,9 @@ model CourseRating {
   course              Course   @relation(fields: [courseId], references: [id])
   courseId            Int
   isAnonymous         Boolean  @default(false)
-  descriptionRating   Int      // 课程与描述相符评分(1-5)
-  valueRating         Int      // 课程内容的价值评分(1-5)
-  teachingRating      Int      // 老师讲解与表达评分(1-5)
+  descriptionRating   Int     @default(5) // 课程与描述相符评分(1-5)
+  valueRating         Int     @default(5) // 课程内容的价值评分(1-5)
+  teachingRating      Int     @default(5) // 老师讲解与表达评分(1-5)
   createdAt           DateTime @default(now())
 
   @@unique([userId, courseId])

@@ -6,17 +6,17 @@ import * as argon2 from 'argon2';
 
 export async function POST(request: Request) {
   try {
-    const { username, email, newPassword } = await request.json();
+    const { nickname, email, newPassword } = await request.json();
 
     // 验证必填字段
-    if (!username || !email || !newPassword) {
+    if (!nickname || !email || !newPassword) {
       return ResponseUtil.error('用户名、邮箱和新密码不能为空');
     }
 
     // 查找用户
     const user = await prisma.user.findFirst({
       where: { 
-        username,
+        nickname,
         email
       }
     });

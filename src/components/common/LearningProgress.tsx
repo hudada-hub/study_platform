@@ -77,13 +77,13 @@ export const LearningProgress: React.FC<LearningProgressProps> = ({
   return (
     <div className={`bg-white rounded-lg p-4 shadow-sm ${className}`}>
       <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-        <FiTrendingUp className="text-orange-500" />
+        <FiTrendingUp className="text-cyan-500" />
         学习统计
       </h3>
       
       <div className="grid grid-cols-2 gap-4">
         <div className="text-center">
-          <div className="text-2xl font-bold text-orange-500">
+          <div className="text-2xl font-bold text-cyan-500">
             {stats.totalPlayTimeMinutes}
           </div>
           <div className="text-sm text-gray-500 flex items-center justify-center gap-1">

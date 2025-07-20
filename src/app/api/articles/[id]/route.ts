@@ -51,11 +51,11 @@ export async function GET(
         author: {
           select: {
             id: true,
-            username: true,
+            nickname: true,
             avatar: true
           }
         },
-        comments: {
+        articleComments: {
           where: {
             isDeleted: false,
             parentCommentId: null // 只获取顶级评论
@@ -68,7 +68,7 @@ export async function GET(
             user: {
               select: {
                 id: true,
-                username: true,
+                nickname: true,
                 avatar: true
               }
             },
@@ -84,7 +84,7 @@ export async function GET(
                 user: {
                   select: {
                     id: true,
-                    username: true,
+                    nickname: true,
                     avatar: true
                   }
                 }
@@ -126,8 +126,8 @@ export async function GET(
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
       viewCount: article.viewCount + 1, // 加上刚刚增加的阅读量
-      categoryId: article.category.id,
-      categoryName: article.category.name,
+      categoryId: article.category?.id,
+      categoryName: article.category?.name,
     };
 
     return NextResponse.json(ResponseUtil.success(formattedArticle));

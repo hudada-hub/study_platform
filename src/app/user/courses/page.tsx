@@ -66,6 +66,9 @@ export default function CoursesPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchKeyword !== filters.keyword) {
+        // 滚动到页面顶部
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
         if (searchKeyword.trim()) {
           search(searchKeyword.trim());
         } else {
@@ -121,10 +124,25 @@ export default function CoursesPage() {
     setSearchKeyword(value);
   };
 
-  // 处理筛选变化
+  // 处理分页变化，滚动到页面顶部
+  const handlePageChange = (page: number, pageSize?: number) => {
+    // 滚动到页面顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // 执行分页操作
+    changePage(page);
+    if (pageSize && pageSize !== pagination.pageSize) {
+      changePageSize(pageSize);
+    }
+  };
+
+  // 处理筛选变化，滚动到页面顶部
   const handleFilterChange = (type: string, value: any) => {
     const newFilters = { ...filters, [type]: value };
     setFilters(newFilters);
+    
+    // 滚动到页面顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // 应用筛选
     if (type === 'categoryId' && value) {
@@ -136,7 +154,7 @@ export default function CoursesPage() {
     }
   };
 
-  // 重置筛选
+  // 重置筛选，滚动到页面顶部
   const handleResetFilters = () => {
     setFilters({
       categoryId: undefined,
@@ -145,6 +163,10 @@ export default function CoursesPage() {
       keyword: '',
     });
     setSearchKeyword('');
+    
+    // 滚动到页面顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     resetFilters();
   };
 
@@ -195,7 +217,7 @@ export default function CoursesPage() {
           <div className="mt-4 flex flex-wrap gap-2">
             <Link 
               href={`/courses/${course.id}`}
-              className="text-primary hover:text-primary-dark"
+              className="text-primary hover:text-primary-dark flex items-center gap-2 justify-center"
               target="_blank"
             >
               查看课程
@@ -265,6 +287,7 @@ export default function CoursesPage() {
             </div>
             
             <Button 
+              className="self-end"
               icon={<Filter className="w-4 h-4" />}
               onClick={handleResetFilters}
             >
@@ -309,12 +332,7 @@ export default function CoursesPage() {
                 showTotal={(total, range) => 
                   `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
                 }
-                onChange={(page, pageSize) => {
-                  changePage(page);
-                  if (pageSize !== pagination.pageSize) {
-                    changePageSize(pageSize);
-                  }
-                }}
+                onChange={handlePageChange}
                 pageSizeOptions={['12', '24', '48', '96']}
               />
             </div>

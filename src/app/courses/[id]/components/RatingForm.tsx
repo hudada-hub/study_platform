@@ -87,7 +87,7 @@ export const RatingForm = ({ courseId, onSuccess }: RatingFormProps) => {
               type="button"
               onClick={() => setRating(prev => ({ ...prev, [name]: star }))}
               className={`text-2xl transition-colors ${
-                star <= (rating[name] as number) ? 'text-orange-500' : 'text-gray-400'
+                star <= (rating[name] as number) ? 'text-cyan-500' : 'text-gray-400'
               }`}
             >
               <FiStar className={star <= (rating[name] as number) ? 'fill-current' : ''} />
@@ -114,7 +114,7 @@ export const RatingForm = ({ courseId, onSuccess }: RatingFormProps) => {
             type="checkbox"
             checked={rating.isAnonymous}
             onChange={(e) => setRating(prev => ({ ...prev, isAnonymous: e.target.checked }))}
-            className="rounded bg-gray-100 border-gray-300 text-orange-500 focus:ring-orange-500"
+            className="rounded bg-gray-100 border-gray-300 text-cyan-500 focus:ring-cyan-500"
           />
           匿名评价
         </label>
@@ -123,7 +123,7 @@ export const RatingForm = ({ courseId, onSuccess }: RatingFormProps) => {
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="w-full px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? '提交中...' : (existingRating ? '更新评价' : '提交评价')}
       </button>

@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       // 如果是充值订单，增加用户积分
       if (order.type === 'RECHARGE' && order.amount.toNumber() > 0) {
         await prisma.user.update({
-          where: { id: order.userId },
+          where: { id: order.userId! },
           data: {
             points: {
               increment: order.amount.toNumber()

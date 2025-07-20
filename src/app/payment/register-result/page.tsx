@@ -63,7 +63,7 @@ export default function PaymentResult() {
     <div className="min-h-screen bg-[#1a1b1c] flex items-center justify-center">
       <div className="bg-[#2a2b2c] p-8 rounded-lg w-[400px] text-center">
         {status === 'loading' && (
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-cyan-500 border-t-transparent mx-auto mb-4"></div>
         )}
         {status === 'success' && (
           <FiCheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
@@ -77,7 +77,7 @@ export default function PaymentResult() {
         <div className="space-x-4">
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+            className="px-6 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-600 transition-colors"
           >
             返回首页
           </button>

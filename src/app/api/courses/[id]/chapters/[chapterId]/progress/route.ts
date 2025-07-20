@@ -64,7 +64,7 @@ export async function POST(
 // 获取学习进度
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string; chapterId: string } }
+  { params }: { params: Promise<{ id: string; chapterId: string }> }
 ) {
   try {
     // 验证用户登录状态
@@ -73,8 +73,8 @@ export async function GET(
       return ResponseUtil.error('请先登录', 401);
     }
 
-    const courseId = parseInt(params.id);
-    const chapterId = parseInt(params.chapterId);
+      const { id, chapterId } = await params;
+    const courseId = parseInt(id);
     const userId = userData.user.id;
 
     // 查找用户的学习进度记录
@@ -82,7 +82,7 @@ export async function GET(
       where: {
         userId,
         courseId,
-        chapterId,
+        chapterId: parseInt(chapterId),
       },
     });
 

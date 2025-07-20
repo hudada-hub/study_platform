@@ -55,7 +55,7 @@ const Header: React.FC = () => {
             <nav className="hidden lg:flex space-x-1 text-gray-700">
               <Link 
                 href="/"
-                className="px-3 py-2 rounded-md hover:bg-gray-100 hover:text-orange-500"
+                className="px-3 py-2 rounded-md hover:bg-gray-100 hover:text-cyan-500"
               >
                 首页
               </Link>
@@ -69,8 +69,8 @@ const Header: React.FC = () => {
                     onMouseLeave={() => setActiveCategory(null)}
                   >
                     <button
-                      className={`px-3 py-2 rounded-md flex items-center gap-1 hover:bg-gray-100 hover:text-orange-500 ${
-                        activeCategory === category.id ? 'text-orange-500 font-bold' : ''
+                      className={`px-3 py-2 rounded-md flex items-center gap-1 hover:bg-gray-100 hover:text-cyan-500 ${
+                        activeCategory === category.id ? 'text-cyan-500 font-bold' : ''
                       }`}
                       onClick={() => router.push(`/articles?categoryId=${category.id}`)}
                     >
@@ -104,7 +104,7 @@ const Header: React.FC = () => {
                             <Link
                               key={child.id}
                               href={`/articles?categoryId=${child.id}`}
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-orange-500"
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-cyan-500"
                             >
                               {child.name}
                             </Link>
@@ -125,7 +125,7 @@ const Header: React.FC = () => {
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                   placeholder="搜索"
-                  className="w-64 px-4 py-1.5 pr-10 rounded-full bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-gray-700"
+                  className="w-64 px-4 py-1.5 pr-10 rounded-full bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-gray-700"
                 />
                 <button
                   type="submit"
@@ -227,7 +227,7 @@ const Header: React.FC = () => {
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                   placeholder="搜索"
-                  className="w-full px-4 py-2 pr-10 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-700"
+                  className="w-full px-4 py-2 pr-10 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-gray-700"
                 />
                 <button
                   type="submit"
@@ -253,7 +253,7 @@ const Header: React.FC = () => {
                 .map(category => (
                   <div key={category.id} className="py-1">
                     <button
-                      className="w-full px-3 py-2.5 rounded-lg text-gray-700 text-left flex items-center justify-between hover:bg-gray-100 hover:text-orange-500"
+                      className="w-full px-3 py-2.5 rounded-lg text-gray-700 text-left flex items-center justify-between hover:bg-gray-100 hover:text-cyan-500"
                       onClick={() => {
                         router.push(`/articles?categoryId=${category.id}`);
                         setIsMobileMenuOpen(false);
@@ -282,7 +282,7 @@ const Header: React.FC = () => {
                         <Link
                           key={child.id}
                           href={`/articles?categoryId=${child.id}`}
-                          className="block px-6 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-50 hover:text-orange-500"
+                          className="block px-6 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-50 hover:text-cyan-500"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
                           {child.name}

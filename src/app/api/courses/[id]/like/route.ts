@@ -5,7 +5,7 @@ import { verifyAuth } from '@/utils/auth';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userData = await verifyAuth(request);
@@ -14,7 +14,8 @@ export async function POST(
       return ResponseUtil.error('请先登录');
     }
 
-    const courseId = parseInt(params.id);
+    const { id } = await params;
+    const courseId = parseInt(id);
     
     // 检查课程是否存在
     const course = await prisma.course.findUnique({

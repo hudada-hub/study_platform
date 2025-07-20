@@ -6,20 +6,21 @@ import { verifyAuth } from '@/utils/auth';
 // 查询订单
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string; chapterId: string } }
+  { params }: { params: Promise<{ id: string; chapterId: string }> }
 ) {
   try {
     const userData = await verifyAuth(req);
     if (!userData?.user?.id) {
       return ResponseUtil.unauthorized('请先登录');
     }
+    const { id, chapterId } = await params;
 
     // 查询是否已经购买过这个章节
     const order = await prisma.courseOrder.findFirst({
       where: {
         userId: userData.user.id,
-        courseId: Number(params.id),
-        chapterId: Number(params.chapterId),
+        courseId: Number(id),
+        chapterId: Number(chapterId),
       },
     });
 
@@ -27,8 +28,8 @@ export async function GET(
       // 如果找到订单，获取章节信息
       const chapter = await prisma.courseChapter.findUnique({
         where: {
-          id: Number(params.chapterId),
-          courseId: Number(params.id),
+          id: Number(chapterId),
+          courseId: Number(id),
         },
         select: {
           videoUrl: true,

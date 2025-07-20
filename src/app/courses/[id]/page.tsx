@@ -65,12 +65,12 @@ const LoginRequired = () => {
   const router = useRouter();
   return (
     <div className="absolute inset-0 bg-black/80 backdrop-blur flex flex-col items-center justify-center text-center z-10">
-      <FiLock className="text-4xl text-orange-500 mb-4" />
+      <FiLock className="text-4xl text-cyan-500 mb-4" />
       <h3 className="text-xl mb-2">本门课程为收费课程</h3>
       <p className="text-gray-400 mb-6">您需要登录后才能观看</p>
       <button
         onClick={() => router.push('/login')}
-        className="px-8 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+        className="px-8 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-600 transition-colors"
       >
         立即登录
       </button>
@@ -98,13 +98,13 @@ const PaymentRequired = ({ points, onPay, coverUrl }: { points: number; onPay: (
 
       {/* 内容 */}
       <div className="relative z-10">
-        <FiCreditCard className="text-4xl text-orange-500 mb-4" />
+        <FiCreditCard className="text-4xl text-cyan-500 mb-4" />
         <h3 className="text-xl mb-2 text-white">本节课程需要支付积分  </h3>
         <p className="text-gray-200 mb-2">需要支付 {points} 积分才能观看</p>
         <p className="text-gray-300 mb-6">*支付后可永久观看</p>
         <button
           onClick={onPay}
-          className="px-8 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+          className="px-8 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-600 transition-colors"
         >
           立即支付 {points} 积分
         </button>
@@ -486,10 +486,11 @@ const CoursePage = () => {
               ) : (
              <div 
                className="w-full h-full bg-center bg-cover bg-no-repeat flex items-center justify-center"
-               style={{ 
-                 backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${course.coverUrl})` 
-               }}
+              style={{
+                backgroundColor: `rgba(0, 0, 0, 1)`,
+              }}
              >
+            
                <div className="text-white text-center">
                  <h3 className="text-xl mb-2">{selectedChapter ? selectedChapter.title : '请选择要播放的视频'}</h3>
                  {selectedChapter && (
@@ -529,7 +530,7 @@ const CoursePage = () => {
                   <button
                     onClick={handleLike}
                     className={`flex items-center gap-2 px-3 py-2 rounded transition-colors border border-gray-200 bg-white text-sm ${
-                      isLiked ? 'text-orange-500 border-orange-200 bg-orange-50' : 'text-gray-500 hover:text-orange-500'
+                      isLiked ? 'text-cyan-500 border-cyan-200 bg-cyan-50' : 'text-gray-500 hover:text-cyan-500'
                     }`}
                   >
                     <FiThumbsUp className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
@@ -538,7 +539,7 @@ const CoursePage = () => {
                   <button
                     onClick={handleFavorite}
                     className={`flex items-center gap-2 px-3 py-2 rounded transition-colors border border-gray-200 bg-white text-sm ${
-                      isFavorited ? 'text-orange-500 border-orange-200 bg-orange-50' : 'text-gray-500 hover:text-orange-500'
+                      isFavorited ? 'text-cyan-500 border-cyan-200 bg-cyan-50' : 'text-gray-500 hover:text-cyan-500'
                     }`}
                   >
                     <FiHeart className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
@@ -554,39 +555,39 @@ const CoursePage = () => {
               onClick={() => setActiveTab('introduction')}
               className={`px-2 md:px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'introduction'
-                  ? 'text-orange-500'
+                  ? 'text-cyan-500'
                   : 'text-gray-400 '
               }`}
             >
               课程介绍
               {activeTab === 'introduction' && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500"></div>
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-500"></div>
               )}
             </button>
             <button
               onClick={() => setActiveTab('rating')}
               className={`px-2 md:px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'rating'
-                  ? 'text-orange-500'
+                  ? 'text-cyan-500'
                   : 'text-gray-400 '
               }`}
             >
               课程评价
               {activeTab === 'rating' && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500"></div>
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-500"></div>
               )}
             </button>
             <button
               onClick={() => setActiveTab('comments')}
               className={`px-2 md:px-6 py-3 text-sm transition-colors relative ${
                 activeTab === 'comments'
-                  ? 'text-orange-500'
+                  ? 'text-cyan-500'
                   : 'text-gray-400 '
               }`}
             >
               课程评论
               {activeTab === 'comments' && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500"></div>
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-500"></div>
               )}
             </button>
        

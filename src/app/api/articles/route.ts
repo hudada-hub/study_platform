@@ -61,7 +61,7 @@ export async function GET(request: Request) {
         author: {
           select: {
             id: true,
-            username: true,
+            nickname: true,
             avatar: true
           }
         }

@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json(ResponseUtil.error('未登录'), { status: 401 });
     }
-    const comment = await prisma.comment.create({
+    const comment = await prisma.articleComment.create({
       data: {
         content,
         articleId: parsedArticleId,
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
         parentCommentId: parentCommentId ? parseInt(parentCommentId) : null // 处理父评论ID
       },
       
-      include: { user: { select: { id: true, avatar: true, username: true } } }
+      include: { user: { select: { id: true, avatar: true, nickname: true } } }
     });
     return NextResponse.json(ResponseUtil.success(comment));
   } catch (error) {

@@ -72,13 +72,13 @@ export const CommentInput = ({
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder={replyingTo ? `回复 ${replyingTo.username}...` : placeholder}
-              className="w-full p-3 bg-white border border-gray-200 rounded-lg resize-none min-h-[80px] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 placeholder-gray-400"
+              className="w-full p-3 bg-white border border-gray-200 rounded-lg resize-none min-h-[80px] focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-gray-900 placeholder-gray-400"
             />
             <button
               type="button"
               ref={emojiButtonRef}
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="absolute bottom-2 right-2 p-2 text-gray-400 hover:text-orange-500 rounded-full hover:bg-gray-100 transition-colors"
+              className="absolute bottom-2 right-2 p-2 text-gray-400 hover:text-cyan-500 rounded-full hover:bg-gray-100 transition-colors"
             >
               <FaceSmileIcon className="w-5 h-5" />
             </button>
@@ -102,7 +102,7 @@ export const CommentInput = ({
           <div className="mt-2 text-right">
             <button
               type="submit"
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-orange-600 transition-colors"
+              className="px-4 py-2 bg-cyan-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyan-600 transition-colors"
               disabled={!content.trim()}
             >
               {replyingTo ? '回复' : '评论'}

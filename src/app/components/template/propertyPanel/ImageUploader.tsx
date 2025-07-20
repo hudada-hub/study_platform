@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { getToken } from '@/utils/request';
-import { Notification } from '@/utils/notification';
 
 interface ImageUploaderProps {
   value: string;
@@ -37,7 +36,6 @@ export default function ImageUploader({ value, onChange }: ImageUploaderProps) {
       }
     } catch (error) {
       console.error('上传失败:', error);
-      Notification.error('图片上传失败，请重试');
     } finally {
       setUploading(false);
     }

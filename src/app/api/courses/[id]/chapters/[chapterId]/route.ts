@@ -5,15 +5,15 @@ import { ResponseUtil } from '@/utils/response';
 // 更新课程章节
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; chapterId: string } }
+  { params }: { params: Promise<{ id: string; chapterId: string }> }
 ) {
   try {
-    const chapterId = parseInt(params.chapterId);
+    const { id, chapterId } = await params;
     const data = await request.json();
     
     // 检查是否是父章节
     const chapter = await prisma.courseChapter.findUnique({
-      where: { id: chapterId },
+      where: { id: Number(chapterId) },
     });
 
     if (!chapter) {
@@ -27,7 +27,7 @@ export async function PUT(
 
     const updatedChapter = await prisma.courseChapter.update({
       where: {
-        id: chapterId,
+        id: Number(chapterId),
       },
       data,
     });
@@ -53,15 +53,16 @@ export async function PUT(
 // 删除课程章节
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; chapterId: string } }
+  { params }: { params: Promise<{ id: string; chapterId: string } > }
 ) {
   try {
-    const chapterId = parseInt(params.chapterId);
+    const { id, chapterId } = await params;
+
     
     // 检查是否有子章节
     const childrenCount = await prisma.courseChapter.count({
       where: {
-        parentId: chapterId,
+        parentId: parseInt(chapterId),
       },
     });
 
@@ -70,11 +71,11 @@ export async function DELETE(
     }
     
     // 查询当前章节所属课程
-    const chapter = await prisma.courseChapter.findUnique({ where: { id: chapterId } });
+    const chapter = await prisma.courseChapter.findUnique({ where: { id: Number(chapterId) } });
     // 删除当前章节
     await prisma.courseChapter.delete({
       where: {
-        id: chapterId,
+        id: Number(chapterId),
       },
     });
     // 更新课程总时长

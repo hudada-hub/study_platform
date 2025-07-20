@@ -133,7 +133,7 @@ export default function UserProfile() {
             </div>
 
             <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-              <FaClock className="text-orange-500 text-xl" />
+              <FaClock className="text-cyan-500 text-xl" />
               <div className="ml-3">
                 <div className="text-sm font-medium text-gray-900">
                   {new Date(profile.lastLoginAt).toLocaleDateString()}

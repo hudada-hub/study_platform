@@ -93,7 +93,7 @@ const CourseTab = () => {
               <div className="flex justify-between items-center">
                 <div className="flex space-x-4 text-sm text-gray-500 dark:text-gray-400">
                   <span className="flex items-center">
-                    <FaHeart className="mr-1 text-orange-500" />
+                    <FaHeart className="mr-1 text-cyan-500" />
                     {course.favoriteCount}
                   </span>
                   <span className="flex items-center">
@@ -105,7 +105,7 @@ const CourseTab = () => {
                     {course.commentCount}
                   </span>
                 </div>
-                <span className="text-orange-500">
+                <span className="text-cyan-500">
                   {course.price > 0 ? `¥${course.price}` : '免费'}
                 </span>
               </div>

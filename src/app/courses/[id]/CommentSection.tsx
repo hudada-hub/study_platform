@@ -192,7 +192,7 @@ export const CommentSection = ({ courseId }: CommentSectionProps) => {
       <div className="flex items-center gap-4 text-sm text-gray-500">
         <button
           onClick={() => setReplyingTo(comment)}
-          className="flex items-center gap-1 hover:text-orange-500 transition-colors"
+          className="flex items-center gap-1 hover:text-cyan-500 transition-colors"
         >
           <ChatBubbleLeftRightIcon className="w-4 h-4" />
           回复
@@ -200,7 +200,7 @@ export const CommentSection = ({ courseId }: CommentSectionProps) => {
         <button
           onClick={() => handleLike(comment)}
           disabled={likingCommentId === comment.id}
-          className={`flex items-center gap-1 ${comment.hasLiked ? 'text-orange-500' : 'hover:text-orange-500'} transition-colors`}
+          className={`flex items-center gap-1 ${comment.hasLiked ? 'text-cyan-500' : 'hover:text-cyan-500'} transition-colors`}
         >
           <ArrowUpOnSquareIcon className={`w-4 h-4 ${comment.hasLiked ? 'fill-current' : ''}`} />
           {comment.likesCount}

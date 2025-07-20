@@ -77,7 +77,7 @@ export default function PaymentConfirmModal({
             </div>
 
             <div className="text-center mb-6">
-              <div className="text-3xl font-medium text-orange-500 mb-2">¥299</div>
+              <div className="text-3xl font-medium text-cyan-500 mb-2">¥299</div>
               <div className="text-gray-500 dark:text-gray-400">终身会员 · 一次付费</div>
             </div>
 
@@ -91,7 +91,7 @@ export default function PaymentConfirmModal({
               <button
                 onClick={onConfirm}
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-6 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? '处理中...' : '确认支付'}
               </button>

@@ -46,7 +46,7 @@ const OrderListTab = () => {
 
   const getStatusTag = (status: string) => {
     const statusMap: Record<string, { color: string; text: string }> = {
-      PENDING: { color: 'orange', text: '待支付' },
+      PENDING: { color: 'cyan', text: '待支付' },
       PAID: { color: 'green', text: '已支付' },
       CANCELLED: { color: 'red', text: '已取消' },
       REFUNDED: { color: 'gray', text: '已退款' },

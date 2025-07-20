@@ -25,8 +25,8 @@ export function useCourseOptions() {
         request('/courses/directions', { method: 'GET' }),
       ]);
 
-      setCategories(categoriesRes.data);
-      setDirections(directionsRes.data);
+      setCategories(categoriesRes.data as Category[]);
+      setDirections(directionsRes.data as Direction[]);
       setError(null);
     } catch (err: any) {
       setError(err);
