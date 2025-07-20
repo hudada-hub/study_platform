@@ -3,11 +3,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 
-  experimental: {
-    // 减少内存使用
-    optimizeCss: true,
-    optimizePackageImports: ['antd', 'react-icons'],
-  },
+
   // 图片配置
   images: {
     remotePatterns: [
