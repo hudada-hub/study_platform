@@ -2,8 +2,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // 优化构建性能
-  swcMinify: true,
+
   experimental: {
     // 减少内存使用
     optimizeCss: true,
