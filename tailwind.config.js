@@ -6,6 +6,10 @@ module.exports = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   important: true,
+  // 优化性能设置
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     extend: {
       width: {
@@ -42,10 +46,13 @@ module.exports = {
         secondary: 'var(--border-color-secondary)',
         light: 'var(--border-color-light)',
       },
-      
     },
   },
   plugins: [
     require('@tailwindcss/typography'),
   ],
+  // 减少CSS输出
+  corePlugins: {
+    preflight: true,
+  },
 } 
