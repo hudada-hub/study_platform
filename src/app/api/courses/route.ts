@@ -10,7 +10,10 @@ export async function GET(request: NextRequest) {
     const categoryId = searchParams.get('categoryId');
     const directionId = searchParams.get('directionId');
     const level = searchParams.get('level');
+    const keyword = searchParams.get('keyword');
     const sort = searchParams.get('sort') || 'latest';
+    const page = parseInt(searchParams.get('page') || '1');
+    const pageSize = parseInt(searchParams.get('pageSize') || '12');
 
     // 构建查询条件
     const where = {
@@ -19,6 +22,31 @@ export async function GET(request: NextRequest) {
       ...(categoryId ? { categoryId: parseInt(categoryId) } : {}),
       ...(directionId ? { directionId: parseInt(directionId) } : {}),
       ...(level ? { level: level as CourseLevel } : {}),
+      // 关键词搜索 - 支持标题、描述、讲师字段的模糊搜索
+      ...(keyword ? {
+        OR: [
+          {
+            title: {
+              contains: keyword,
+            },
+          },
+          {
+            description: {
+              contains: keyword,
+            },
+          },
+          {
+            summary: {
+              contains: keyword,
+            },
+          },
+          {
+            instructor: {
+              contains: keyword,
+            },
+          },
+        ],
+      } : {}),
     };
 
     // 构建排序条件
@@ -40,6 +68,10 @@ export async function GET(request: NextRequest) {
         orderBy = { createdAt: 'desc' };
     }
 
+    // 获取总数
+    const total = await prisma.course.count({ where });
+
+    // 获取分页数据
     const courses = await prisma.course.findMany({
       where,
       orderBy,
@@ -55,35 +87,19 @@ export async function GET(request: NextRequest) {
           },
         },
       },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
     
-    return ResponseUtil.success(courses);
+    return ResponseUtil.success({
+      list: courses,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    });
   } catch (error) {
     console.error('获取课程列表失败:', error);
     return ResponseUtil.error('获取课程列表失败');
   }
 }
-
-// 创建课程
-export async function POST(request: NextRequest) {
-  try {
-    const { user } = await verifyAuth(request);
-    if (!user) {
-      return ResponseUtil.unauthorized('未登录');
-    }
-
-    const data = await request.json();
-
-    const course = await prisma.course.create({
-      data: {
-        ...data,
-        uploaderId: user.id,
-      },
-    });
-
-    return ResponseUtil.success(course);
-  } catch (error) {
-    console.error('创建课程失败:', error);
-    return ResponseUtil.error('创建课程失败');
-  }
-} 

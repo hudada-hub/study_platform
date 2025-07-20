@@ -1,14 +1,17 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { Button, Space, Popconfirm, message, Tag } from 'antd';
+import { useState, useEffect, useCallback } from 'react';
+import { Button, Space, Popconfirm, message, Tag, Pagination, Select, Input, Card, Row, Col } from 'antd';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, Search, Filter } from 'lucide-react';
 import AddCourseModal from './components/AddCourseModal';
 import { useCourses } from './hooks/useCourses';
 import { request } from '@/utils/request';
 import ChapterModal from './components/ChapterModal';
 import { CosImage } from '@/components/common/CosImage';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+
+const { Search: SearchInput } = Input;
+const { Option } = Select;
 
 const levelColors = {
   BEGINNER: 'green',
@@ -29,10 +32,51 @@ const levelLabels = {
 export default function CoursesPage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingCourse, setEditingCourse] = useState<any>(null);
-  const { courses, loading, error, refreshCourses } = useCourses();
   const [isChapterModalOpen, setIsChapterModalOpen] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
+
+  // 筛选状态
+  const [filters, setFilters] = useState({
+    categoryId: undefined as number | undefined,
+    directionId: undefined as number | undefined,
+    level: undefined as string | undefined,
+    keyword: '',
+  });
+
+  // 防抖搜索状态
+  const [searchKeyword, setSearchKeyword] = useState('');
+
+  const { 
+    courses, 
+    loading, 
+    error, 
+    pagination,
+    refreshCourses,
+    changePage,
+    changePageSize,
+    filterByCategory,
+    filterByDirection,
+    filterByLevel,
+    search,
+    resetFilters
+  } = useCourses();
+
+  // 防抖搜索处理
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchKeyword !== filters.keyword) {
+        if (searchKeyword.trim()) {
+          search(searchKeyword.trim());
+        } else {
+          resetFilters();
+        }
+        setFilters(prev => ({ ...prev, keyword: searchKeyword }));
+      }
+    }, 500); // 500ms 防抖延迟
+
+    return () => clearTimeout(timer);
+  }, [searchKeyword, search, resetFilters]);
 
   const showModal = () => {
     setEditingCourse(null);
@@ -67,12 +111,49 @@ export default function CoursesPage() {
     }
   };
 
+  // 处理搜索输入变化
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(e.target.value);
+  };
+
+  // 处理搜索按钮点击
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value);
+  };
+
+  // 处理筛选变化
+  const handleFilterChange = (type: string, value: any) => {
+    const newFilters = { ...filters, [type]: value };
+    setFilters(newFilters);
+    
+    // 应用筛选
+    if (type === 'categoryId' && value) {
+      filterByCategory(value);
+    } else if (type === 'directionId' && value) {
+      filterByDirection(value);
+    } else if (type === 'level' && value) {
+      filterByLevel(value);
+    }
+  };
+
+  // 重置筛选
+  const handleResetFilters = () => {
+    setFilters({
+      categoryId: undefined,
+      directionId: undefined,
+      level: undefined,
+      keyword: '',
+    });
+    setSearchKeyword('');
+    resetFilters();
+  };
+
   if (error) {
     return <div>加载失败: {error.message}</div>;
   }
 
   const renderCourseCard = (course: any) => (
-    <div key={course.id} className="bg-white rounded-lg overflow-hidden  mb-4">
+    <Card key={course.id} className="mb-4">
       <div className="flex flex-col sm:flex-row">
         {/* 课程封面 */}
         <div className="w-full sm:w-48 h-32 sm:h-full relative">
@@ -138,7 +219,7 @@ export default function CoursesPage() {
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 
   return (
@@ -150,16 +231,95 @@ export default function CoursesPage() {
         </Button>
       </div>
 
+      {/* 筛选和搜索区域 */}
+      <Card className="mb-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-end">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">搜索课程</label>
+            <SearchInput
+              placeholder="输入课程标题或描述关键词"
+              value={searchKeyword}
+              onChange={handleSearchChange}
+              onSearch={handleSearch}
+              enterButton={<Search className="w-4 h-4" />}
+              allowClear
+            />
+          </div>
+          
+          <div className="flex gap-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">难度</label>
+              <Select
+                placeholder="选择难度"
+                value={filters.level}
+                onChange={(value) => handleFilterChange('level', value)}
+                allowClear
+                style={{ width: 120 }}
+              >
+                <Option value="BEGINNER">入门</Option>
+                <Option value="ELEMENTARY">初级</Option>
+                <Option value="INTERMEDIATE">中级</Option>
+                <Option value="ADVANCED">高级</Option>
+                <Option value="EXPERT">专家</Option>
+              </Select>
+            </div>
+            
+            <Button 
+              icon={<Filter className="w-4 h-4" />}
+              onClick={handleResetFilters}
+            >
+              重置
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* 统计信息 */}
+      <div className="mb-4 text-sm text-gray-600">
+        共 {pagination.total} 门课程，第 {pagination.page} 页，每页 {pagination.pageSize} 条
+      </div>
+
       {/* 加载状态 */}
       {loading ? (
         <div className="flex justify-center items-center min-h-[200px]">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
-        /* 课程列表 */
-        <div className="space-y-4">
-          {courses.map(renderCourseCard)}
-        </div>
+        <>
+          {/* 课程列表 */}
+          <div className="space-y-4 mb-6">
+            {courses.length > 0 ? (
+              courses.map(renderCourseCard)
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                暂无课程数据
+              </div>
+            )}
+          </div>
+
+          {/* 分页组件 */}
+          {pagination.total > 0 && (
+            <div className="flex justify-center">
+              <Pagination
+                current={pagination.page}
+                total={pagination.total}
+                pageSize={pagination.pageSize}
+                showSizeChanger
+                showQuickJumper
+                showTotal={(total, range) => 
+                  `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+                }
+                onChange={(page, pageSize) => {
+                  changePage(page);
+                  if (pageSize !== pagination.pageSize) {
+                    changePageSize(pageSize);
+                  }
+                }}
+                pageSizeOptions={['12', '24', '48', '96']}
+              />
+            </div>
+          )}
+        </>
       )}
 
       <AddCourseModal

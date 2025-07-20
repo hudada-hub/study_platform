@@ -3,6 +3,10 @@
 密码： 820035003Tengxunyun
 
 
+[1Panel Log]: 您设置的面板安全入口是 0b4a88695d 
+设置 1Panel 面板用户 (默认是 f9d8fbd027): 
+[1Panel Log]: 设置 1Panel 面板密码，设置后按回车键继续 (默认是 4251beff84)
+
 
 docker run -d --name study_pgsql -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root123456 -e POSTGRES_DB=study_platform -p 5432:5432 postgres:15
 数据库迁移命令：npx prisma migrate dev --name init

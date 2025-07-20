@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Modal, Form, Input, Button, Space, Upload, message, Select } from 'antd';
 import { Image as ImageIcon } from 'lucide-react';
 import { request } from '@/utils/request';
@@ -17,6 +17,9 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
   const [loading, setLoading] = useState(false);
   const [coverUrl, setCoverUrl] = useState('');
   const { categories, directions, loading: optionsLoading } = useCourseOptions();
+  
+  // 添加Upload组件的ref
+  const uploadRef = useRef<any>(null);
 
   // 当编辑的课程数据变化时，设置表单数据
   useEffect(() => {
@@ -40,6 +43,10 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
     } else {
       form.resetFields();
       setCoverUrl('');
+      // 重置Upload组件
+      if (uploadRef.current) {
+        uploadRef.current.fileList = [];
+      }
     }
   }, [editingCourse, form]);
 
@@ -69,6 +76,10 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
       }
       form.resetFields();
       setCoverUrl('');
+      // 重置Upload组件
+      if (uploadRef.current) {
+        uploadRef.current.fileList = [];
+      }
       onClose();
     } catch (error) {
       message.error(editingCourse ? '课程编辑失败' : '课程添加失败');
@@ -97,6 +108,7 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
           help="建议尺寸: 800x450px，支持jpg、png格式"
         >
           <Upload
+            ref={uploadRef}
             action="/api/common/upload"
             listType="picture-card"
             maxCount={1}

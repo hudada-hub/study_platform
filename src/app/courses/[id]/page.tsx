@@ -135,7 +135,7 @@ const CoursePage = () => {
   const [hasPurchased, setHasPurchased] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
-  const [activeTab, setActiveTab] = useState('catalog'); // 新增：当前激活的选项卡
+  const [activeTab, setActiveTab] = useState('introduction'); // 新增：当前激活的选项卡
   const [chapterProgress, setChapterProgress] = useState<{ [key: number]: number }>({}); // 新增：章节进度状态
   const [userId, setUserId] = useState<number | null>(null);
   const [chapterVideoUrl, setChapterVideoUrl] = useState<string | null>(null);
@@ -589,19 +589,7 @@ const CoursePage = () => {
                 <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500"></div>
               )}
             </button>
-            <button
-              onClick={() => setActiveTab('catalog')}
-              className={`px-2 md:px-6 py-3 text-sm transition-colors relative ${
-                activeTab === 'catalog'
-                  ? 'text-orange-500'
-                  : 'text-gray-400 '
-              }`}
-            >
-              课程目录
-              {activeTab === 'catalog' && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500"></div>
-              )}
-            </button>
+       
           
           </div>
 

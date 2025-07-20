@@ -8,6 +8,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "batch-add-courses": "tsx scripts/batchAddCourses.ts",
     "prisma": "prisma generate&&npx prisma db push"
   },
   "dependencies": {

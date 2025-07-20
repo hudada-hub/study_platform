@@ -373,11 +373,14 @@ model VerificationCode {
   @@index([phone, expiresAt])
 }
 
-// 课程难度枚举
+
 enum CourseLevel {
-  BEGINNER    // 初级
+  BEGINNER    // 入门
+  ELEMENTARY  // 初级
   INTERMEDIATE // 中级
   ADVANCED     // 高级
+  EXPERT
+
 }
 
 // 课程状态枚举

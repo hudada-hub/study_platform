@@ -1,29 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { FiClock, FiStar, FiUsers } from 'react-icons/fi';
+import { Pagination } from 'antd';
 import { request } from '@/utils/request';
-import { CourseLevel } from '@prisma/client';
-import { CosImage } from '@/components/common/CosImage';
-
-// 课程类型定义
-interface Course {
-  id: number;
-  title: string;
-  coverUrl: string;
-  summary: string;
-  description: string;
-  instructor: string;
-  viewCount: number;
-  studentCount: number;
-  level: CourseLevel;
-  totalDuration: number;
-  ratingScore: number;
-  categoryId: number;
-  directionId: number;
-}
+import CourseCard, { Course } from './components/CourseCard';
 
 // 分类类型定义
 interface Category {
@@ -35,6 +15,16 @@ interface Category {
 interface Direction {
   id: number;
   name: string;
+}
+
+// 分页响应类型
+interface PaginatedResponse {
+  list: Course[];
+  pagination: {
+    current: number;
+    pageSize: number;
+    total: number;
+  };
 }
 
 // 筛选项组件
@@ -103,74 +93,6 @@ const SortTabs = ({
   );
 };
 
-// 课程卡片组件
-const CourseCard = ({ course }: { course: Course }) => {
-  const getLevelText = (level: CourseLevel) => {
-    switch (level) {
-      case 'BEGINNER':
-        return '初级';
-      case 'INTERMEDIATE':
-        return '中级';
-      case 'ADVANCED':
-        return '高级';
-      default:
-        return '未知';
-    }
-  };
-
-  const getLevelColor = (level: CourseLevel) => {
-    switch (level) {
-      case 'BEGINNER':
-        return 'bg-green-100 text-green-800';
-      case 'INTERMEDIATE':
-        return 'bg-blue-100 text-blue-800';
-      case 'ADVANCED':
-        return 'bg-purple-100 text-purple-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  return (
-    <Link href={`/courses/${course.id}`} className="block">
-      <div className="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
-        <div className="relative h-48">
-          <CosImage
-            path={course.coverUrl || '/default-course-cover.jpg'}
-            alt={course.title}
-            width={200}
-            height={300}
-            className="object-cover"
-          />
-          <div className="absolute top-2 right-2">
-            <span className={`px-2 py-1 rounded-full text-xs ${getLevelColor(course.level)}`}>
-              {getLevelText(course.level)}
-            </span>
-          </div>
-        </div>
-        <div className="p-4">
-          <h3 className="text-lg mb-2">{course.title}</h3>
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">{course.summary || course.description}</p>
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <div className="flex items-center">
-              <FiUsers className="mr-1" />
-              <span>{course.studentCount}人学习</span>
-            </div>
-            <div className="flex items-center">
-              <FiStar className="mr-1 text-yellow-400" />
-              <span>{course.ratingScore.toFixed(1)}</span>
-            </div>
-            <div className="flex items-center">
-              <FiClock className="mr-1" />
-              <span>{Math.floor(course.totalDuration / 60)}小时</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Link>
-  );
-};
-
 // 课程页面
 const CoursesPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -181,6 +103,11 @@ const CoursesPage = () => {
   const [selectedLevel, setSelectedLevel] = useState(0);
   const [activeTab, setActiveTab] = useState('latest');
   const [loading, setLoading] = useState(true);
+  
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const pageSize = 12;
 
   const levels = [
     { id: 1, name: '初级', value: 'BEGINNER' },
@@ -215,9 +142,12 @@ const CoursesPage = () => {
         if (selectedDirection) params.append('directionId', selectedDirection.toString());
         if (selectedLevel) params.append('level', levels.find(l => l.id === selectedLevel)?.value || '');
         params.append('sort', activeTab);
+        params.append('page', currentPage.toString());
+        params.append('pageSize', pageSize.toString());
 
-        const response = await request<Course[]>(`/courses?${params.toString()}`);
-        setCourses(response.data);
+        const response = await request<PaginatedResponse>(`/courses?${params.toString()}`);
+        setCourses(response.data.list);
+        setTotal(response.data.pagination.total);
       } catch (error) {
         console.error('获取课程列表失败:', error);
       } finally {
@@ -225,9 +155,36 @@ const CoursesPage = () => {
       }
     };
     fetchCourses();
-  }, [selectedCategory, selectedDirection, selectedLevel, activeTab]);
+  }, [selectedCategory, selectedDirection, selectedLevel, activeTab, currentPage]);
 
- 
+  // 处理分页变化
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // 滚动到页面顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 处理筛选条件变化，重置到第一页
+  const handleFilterChange = (type: string, value: number) => {
+    setCurrentPage(1);
+    switch (type) {
+      case 'category':
+        setSelectedCategory(value);
+        break;
+      case 'direction':
+        setSelectedDirection(value);
+        break;
+      case 'level':
+        setSelectedLevel(value);
+        break;
+    }
+  };
+
+  // 处理排序变化，重置到第一页
+  const handleSortChange = (tab: string) => {
+    setCurrentPage(1);
+    setActiveTab(tab);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -238,34 +195,53 @@ const CoursesPage = () => {
             title="方向"
             items={directions}
             selectedId={selectedDirection}
-            onSelect={setSelectedDirection}
+            onSelect={(id) => handleFilterChange('direction', id)}
           />
           <FilterItem
             title="分类"
             items={categories}
             selectedId={selectedCategory}
-            onSelect={setSelectedCategory}
+            onSelect={(id) => handleFilterChange('category', id)}
           />
           <FilterItem
             title="难度"
             items={levels}
             selectedId={selectedLevel}
-            onSelect={setSelectedLevel}
+            onSelect={(id) => handleFilterChange('level', id)}
           />
         </div>
 
         {/* 排序和课程列表 */}
         <div className="bg-white rounded-lg p-6">
-          <SortTabs activeTab={activeTab} onTabChange={setActiveTab} />
+          <SortTabs activeTab={activeTab} onTabChange={handleSortChange} />
           
           {loading ? (
             <div className="text-center py-12">加载中...</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {courses.map((course) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {courses.map((course) => (
+                  <CourseCard key={course.id} course={course} />
+                ))}
+              </div>
+              
+              {/* 分页组件 */}
+              {total > pageSize && (
+                <div className="flex justify-center">
+                  <Pagination
+                    current={currentPage}
+                    total={total}
+                    pageSize={pageSize}
+                    onChange={handlePageChange}
+                    showSizeChanger={false}
+                    showQuickJumper
+                    showTotal={(total, range) => 
+                      `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+                    }
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -273,4 +249,4 @@ const CoursesPage = () => {
   );
 };
 
-export default CoursesPage; 
+export default CoursesPage;
