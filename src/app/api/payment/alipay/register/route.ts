@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
         phone,
         nickname,
         status: 'PENDING',
+        password
         // 其他字段如有需要可补充
       }
     });
@@ -75,7 +76,8 @@ export async function POST(req: NextRequest) {
 
     return ResponseUtil.success({
       orderNo,
-      paymentForm: result
+      paymentForm: result,
+      password
     });
   } catch (error: any) {
     console.error('创建支付订单失败:', error);

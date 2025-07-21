@@ -37,7 +37,7 @@ export default function PaymentResult() {
             const loginResponse = await request('/auth/login', {
               method: 'POST',
               body: JSON.stringify({
-                phone: data.phone,
+                account: data.phone,
                 password: data.password,
               }),
             });
