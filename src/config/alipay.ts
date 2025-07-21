@@ -33,7 +33,7 @@ export const alipaySandboxConfig = {
   gateway: 'https://openapi-sandbox.dl.alipaydev.com/gateway.do',
   returnUrl: 'http://154.201.73.21:3000/payment/result', // 支付结果页面
   notifyUrl: 'http://154.201.73.21:3000/api/payment/alipay/notify', // 异步通知接口
-  registerNotifyUrl: 'http://154.201.73.21:3000/api/payment/register-notify', // 注册订单异步通知接口
+  registerNotifyUrl: 'http://154.201.73.21:3000/api/payment/alipay/register-notify', // 注册订单异步通知接口
   registerReturnUrl: 'http://154.201.73.21:3000/payment/register-result', // 注册订单支付结果页面
 };
 
@@ -42,9 +42,9 @@ export const alipayProdConfig = {
   appId: process.env.NEXT_PUBLIC_ALIPAY_SANDBOX_APP_ID || '',
   privateKey: process.env.ALIPAY_SANDBOX_PRIVATE_KEY || '',
   publicKey: process.env.ALIPAY_SANDBOX_PUBLIC_KEY || '',
-  gateway: 'https://openapi.alipay.com/gateway.do',
+  gateway: 'https://openapi-sandbox.dl.alipaydev.com/gateway.do',
   returnUrl: 'http://154.201.73.21:3000/payment/result', // 支付结果页面
   notifyUrl: 'http://154.201.73.21:3000/api/payment/alipay/notify', // 异步通知接口
-  registerNotifyUrl: 'http://154.201.73.21:3000/api/payment/register-notify',// 注册订单异步通知接口
+  registerNotifyUrl: 'http://154.201.73.21:3000/api/payment/alipay/register-notify',// 注册订单异步通知接口
   registerReturnUrl: 'http://154.201.73.21:3000/payment/result', // 注册订单支付结果页面
 }; 
