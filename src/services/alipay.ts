@@ -23,10 +23,13 @@ class AlipayService {
     body: string;
   }) {
     const { outTradeNo, totalAmount, subject, body } = params;
+    const notifyUrl = subject=='注册会员'?alipaySandboxConfig.registerNotifyUrl:alipaySandboxConfig.notifyUrl;
+    const returnUrl = subject=='注册会员'?alipaySandboxConfig.registerReturnUrl:alipaySandboxConfig.returnUrl;
+    console.log(notifyUrl,returnUrl,'111111111111')
 
     const result = await this.sdk.pageExec('alipay.trade.page.pay', {
-      notify_url:subject=='注册会员'?alipaySandboxConfig.registerNotifyUrl:alipaySandboxConfig.notifyUrl,
-      return_url: subject=='注册会员'?alipaySandboxConfig.registerReturnUrl:alipaySandboxConfig.returnUrl,
+      notify_url:notifyUrl,
+      return_url: returnUrl,
       bizContent: {
         out_trade_no: outTradeNo,
         total_amount: totalAmount,
