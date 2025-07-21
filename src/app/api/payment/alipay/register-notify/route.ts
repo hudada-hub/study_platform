@@ -7,6 +7,7 @@ import { OrderStatus } from '@prisma/client';
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('回调')
     const body = await req.formData();
     const params: Record<string, string> = {};
     
