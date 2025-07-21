@@ -44,7 +44,7 @@ const FilterItem = ({
       <span className="text-gray-500 w-20">{title}：</span>
       <div className="flex flex-wrap gap-4">
         <span 
-          className={`cursor-pointer ${selectedId === 0 ? 'text-primary' : 'text-gray-600'}`}
+          className={`cursor-pointer ${selectedId === 0 ? 'text-cyan-500' : 'text-gray-600'}`}
           onClick={() => onSelect(0)}
         >
           全部
@@ -52,7 +52,7 @@ const FilterItem = ({
         {items.map(item => (
           <span
             key={item.id}
-            className={`cursor-pointer ${selectedId === item.id ? 'text-primary' : 'text-gray-600'}`}
+            className={`cursor-pointer ${selectedId === item.id ? 'text-cyan-500' : 'text-gray-600'}`}
             onClick={() => onSelect(item.id)}
           >
             {item.name}
@@ -83,7 +83,7 @@ const SortTabs = ({
       {tabs.map(tab => (
         <span
           key={tab.key}
-          className={`cursor-pointer ${activeTab === tab.key ? 'text-primary border-b-2 border-primary' : 'text-gray-600'}`}
+          className={`cursor-pointer ${activeTab === tab.key ? 'text-cyan-500 border-b-2 border-cyan-500' : 'text-gray-600'}`}
           onClick={() => onTabChange(tab.key)}
         >
           {tab.label}

@@ -25,7 +25,7 @@ export interface ThemeConfig {
 }
 
 export const defaultTheme: ThemeConfig = {
-  primaryColor: '#333',
+  primaryColor: 'rgb(0,185,219)',
   secondaryColor: '#666',
   successColor: '#52c41a',
   warningColor: '#faad14',
@@ -37,7 +37,7 @@ export const defaultTheme: ThemeConfig = {
     disabled: '#00000040',
   },
   backgroundColor: {
-    primary: '#22272f',
+    primary: 'rgb(0,185,219)',
     secondary: '#fff',
     light: '#f5f5f5',
   },

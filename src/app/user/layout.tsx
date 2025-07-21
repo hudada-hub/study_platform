@@ -48,7 +48,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center px-4 py-3 rounded-md transition-colors w-full ${
                       pathname === tab.path
-                        ? 'bg-primary text-white font-medium'
+                        ? 'bg-cyan-500 text-white font-medium'
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
                   >
@@ -74,7 +74,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
                   href={tab.path}
                   className={`flex items-center px-4 py-3 rounded-md transition-colors w-full ${
                     pathname === tab.path
-                      ? 'bg-primary text-white font-medium'
+                      ? 'bg-cyan-500 text-white font-medium'
                       : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
