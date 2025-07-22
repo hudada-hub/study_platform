@@ -68,7 +68,7 @@ export async function PUT(req: NextRequest) {
 
     // 检查用户名是否已被使用
     if (nickname && nickname !== user.nickname) {
-      const existingUser = await prisma.user.findUnique({
+      const existingUser = await prisma.user.findFirst({
         where: { nickname }
       });
       if (existingUser) {
