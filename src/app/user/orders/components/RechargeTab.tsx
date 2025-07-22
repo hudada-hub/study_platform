@@ -53,9 +53,9 @@ const RechargeTab = () => {
   // 查询支付状态
   const queryPaymentStatus = async (orderNo: string) => {
     try {
-      const res = await request<AlipayQueryResponse>('/payment/alipay/query', {
-        method: 'POST',
-        body: JSON.stringify({ orderNo }),
+      const res = await request<AlipayQueryResponse>(`/payment/alipay/query?outTradeNo=${orderNo}`, {
+        method: 'GET',
+     
       });
 
       if (res.code === 0) {

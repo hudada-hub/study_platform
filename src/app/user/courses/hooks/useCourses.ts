@@ -65,7 +65,7 @@ export function useCourses() {
       if (params.level) queryParams.append('level', params.level);
       if (params.keyword) queryParams.append('keyword', params.keyword);
 
-      const response = await request(`/courses?${queryParams.toString()}`, {
+      const response = await request(`/user/courses?${queryParams.toString()}`, {
         method: 'GET',
       });
 

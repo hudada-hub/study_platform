@@ -69,14 +69,14 @@ const CourseTab = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {courses.map(course => (
           <Link
             key={course.id}
             href={`/courses/${course.id}`}
-            className="block bg-white dark:bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+            className="block bg-white dark:bg-gray-800 rounded-lg overflow-hidden "
           >
-            <div className="relative h-48">
+            <div className="relative h-68 ">
               <CosImage
                 path={course.coverUrl}
                 alt={course.title}
@@ -87,9 +87,7 @@ const CourseTab = () => {
             </div>
             <div className="p-4">
               <h3 className="text-lg mb-2 line-clamp-1">{course.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
-                {course.description}
-              </p>
+              
               <div className="flex justify-between items-center">
                 <div className="flex space-x-4 text-sm text-gray-500 dark:text-gray-400">
                   <span className="flex items-center">
