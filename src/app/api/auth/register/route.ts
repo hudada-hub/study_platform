@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查昵称是否已存在
-    const existingUsername = await prisma.user.findUnique({
+    const existingUsername = await prisma.user.findFirst({
       where: {
         nickname: nickname,
       },
