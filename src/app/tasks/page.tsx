@@ -43,15 +43,16 @@ interface Task {
 const TaskPage: React.FC = () => {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [categories, setCategories] = useState<TaskCategory[]>([]);
   const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [categories, setCategories] = useState<TaskCategory[]>([]);
 
   // 获取任务分类
   const fetchCategories = async () => {
@@ -76,6 +77,7 @@ const TaskPage: React.FC = () => {
         pageSize,
         keyword: searchKeyword,
         categoryId: selectedCategory,
+        status: selectedStatus, // 新增状态筛选参数
         sortBy,
         sortOrder,
       };
@@ -102,7 +104,7 @@ const TaskPage: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [currentPage, pageSize, searchKeyword, selectedCategory, sortBy, sortOrder]);
+  }, [currentPage, pageSize, searchKeyword, selectedCategory, selectedStatus, sortBy, sortOrder]);
 
   // 处理搜索
   const handleSearch = (value: string) => {
@@ -113,6 +115,12 @@ const TaskPage: React.FC = () => {
   // 处理分类筛选
   const handleCategoryChange = (value: number | null) => {
     setSelectedCategory(value);
+    setCurrentPage(1);
+  };
+
+  // 处理状态筛选
+  const handleStatusChange = (value: string | null) => {
+    setSelectedStatus(value);
     setCurrentPage(1);
   };
 
@@ -208,39 +216,101 @@ const TaskPage: React.FC = () => {
             </Button>
             </div>
 
-          {/* 第二排：方向筛选 */}
+          {/* 第二排：任务分类 */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">任务分类:</span>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">任务分类:</span>
-              <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleCategoryChange(null)}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  selectedCategory === null
+                    ? 'bg-cyan-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
+              >
+                全部
+              </button>
+              {categories.map(category => (
                 <button
-                  onClick={() => handleCategoryChange(null)}
+                  key={category.id}
+                  onClick={() => handleCategoryChange(category.id)}
                   className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                    selectedCategory === null
+                    selectedCategory === category.id
                       ? 'bg-cyan-500 text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   disabled={loading}
                 >
-                  全部
+                  {category.name}
                 </button>
-                {categories.map(category => (
-                  <button
-                    key={category.id}
-                    onClick={() => handleCategoryChange(category.id)}
-                    className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                      selectedCategory === category.id
-                        ? 'bg-cyan-500 text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    disabled={loading}
-                  >
-                    {category.name}
-                  </button>
-                ))}
-              </div>
+              ))}
             </div>
+          </div>
 
-          {/* 第三排：排序 */}
+          {/* 第三排：任务状态 */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">任务状态:</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleStatusChange(null)}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  selectedStatus === null
+                    ? 'bg-cyan-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
+              >
+                全部
+              </button>
+              <button
+                onClick={() => handleStatusChange('APPROVED')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  selectedStatus === 'APPROVED'
+                    ? 'bg-cyan-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
+              >
+                发布中任务
+              </button>
+              <button
+                onClick={() => handleStatusChange('IN_PROGRESS')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  selectedStatus === 'IN_PROGRESS'
+                    ? 'bg-cyan-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
+              >
+                执行中任务
+              </button>
+              <button
+                onClick={() => handleStatusChange('COMPLETED')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  selectedStatus === 'COMPLETED'
+                    ? 'bg-cyan-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
+              >
+                已完成任务
+              </button>
+              <button
+                onClick={() => handleStatusChange('ADMIN_CONFIRMED')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  selectedStatus === 'ADMIN_CONFIRMED'
+                    ? 'bg-cyan-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
+              >
+                管理员已确认完成任务
+              </button>
+            </div>
+          </div>
+
+          {/* 第四排：排序 */}
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">排序:</span>
             <div className="flex items-center gap-2">

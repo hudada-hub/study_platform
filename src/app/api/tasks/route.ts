@@ -11,12 +11,12 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '12');
     const keyword = searchParams.get('keyword') || '';
     const categoryId = searchParams.get('categoryId');
+    const status = searchParams.get('status'); // 新增状态筛选参数
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     // 构建查询条件
     const where: any = {
-      isDeleted: false,
       isHidden: false,
     };
 
@@ -33,8 +33,13 @@ export async function GET(request: NextRequest) {
       where.categoryId = parseInt(categoryId);
     }
 
-    // 只显示已通过审核的任务
-    where.status = 'APPROVED';
+    // 状态筛选 - 如果没有指定状态，默认显示已通过的任务
+    if (status) {
+      where.status = status;
+    } else {
+      // 默认只显示已通过审核的任务
+      where.status = 'APPROVED';
+    }
 
     // 构建排序 - 优先按置顶排序，然后按发布时间排序
     let orderBy: any[] = [];

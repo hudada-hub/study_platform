@@ -12,7 +12,7 @@
  Target Server Version : 150013
  File Encoding         : 65001
 
- Date: 14/08/2025 15:56:59
+ Date: 15/08/2025 15:37:51
 */
 
 
@@ -155,7 +155,11 @@ CREATE TYPE "public"."TaskStatus" AS ENUM (
   'REJECTED',
   'IN_PROGRESS',
   'COMPLETED',
-  'CONFIRMED'
+  'ADMIN_CONFIRMED',
+  'PUBLISHER_CONFIRMED',
+  'WITHDRAW_REQUESTED',
+  'WITHDRAW_SUCCESS',
+  'WITHDRAW_FAILED'
 );
 ALTER TYPE "public"."TaskStatus" OWNER TO "root";
 
@@ -736,6 +740,17 @@ START 1
 CACHE 1;
 
 -- ----------------------------
+-- Sequence structure for WithdrawRecord_id_seq
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "public"."WithdrawRecord_id_seq";
+CREATE SEQUENCE "public"."WithdrawRecord_id_seq" 
+INCREMENT 1
+MINVALUE  1
+MAXVALUE 2147483647
+START 1
+CACHE 1;
+
+-- ----------------------------
 -- Table structure for Article
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."Article";
@@ -759,6 +774,10 @@ CREATE TABLE "public"."Article" (
 -- ----------------------------
 -- Records of Article
 -- ----------------------------
+INSERT INTO "public"."Article" VALUES (1, '用户协议', NULL, '<h1 style="text-align: start;">用户协议</h1><p><br></p><p>欢迎使用我们的服务！</p><h2>1. 协议的范围</h2><p>本协议是您与平台之间关于使用平台服务所订立的协议。</p><h2>2. 账号注册</h2><p>您承诺提供真实、准确、完整的注册信息。</p><h2>3. 用户行为规范</h2><p>您在使用服务时需遵守相关法律法规。</p>', NULL, 0, 0, 0, 'PUBLISHED', 1, 1, '2025-08-15 01:36:14.533', '2025-08-15 01:36:14.533');
+INSERT INTO "public"."Article" VALUES (3, '用户隐私协议', NULL, '<h1 style="text-align: start;">用户隐私协议</h1><p><br></p><h2>1. 信息收集</h2><p>我们收集的信息类型及其用途。</p><h2>2. 信息使用</h2><p>我们如何使用和保护您的个人信息。</p><h2>3. 信息共享</h2><p>在何种情况下我们会共享您的信息。</p>', NULL, 21, 0, 0, 'PUBLISHED', 1, 1, '2025-08-15 01:38:27.33', '2025-08-15 02:15:31.044');
+INSERT INTO "public"."Article" VALUES (4, '用户付费协议', NULL, '<h1 style="text-align: start;">用户付费协议</h1><p><br></p><h2>1. 付费内容</h2><p>关于平台付费内容的说明。</p><h2>2. 支付方式</h2><p>支持的支付方式及流程说明。</p><h2>3. 退款政策</h2><p>关于退款的政策说明。</p>', NULL, 21, 0, 0, 'PUBLISHED', 1, 1, '2025-08-15 01:39:05.025', '2025-08-15 02:15:36.483');
+INSERT INTO "public"."Article" VALUES (2, '版权与免责声明', NULL, '<h1 style="text-align: start;">版权与免责声明</h1><p><br></p><h2>1. 知识产权声明</h2><p>平台上的所有内容均受著作权法及其他相关法律法规的保护。</p><h2>2. 免责声明</h2><p>平台不对用户发布的内容承担责任。</p>', NULL, 9, 0, 0, 'PUBLISHED', 1, 1, '2025-08-15 01:38:02.265', '2025-08-15 02:10:52.756');
 
 -- ----------------------------
 -- Table structure for ArticleCategory
@@ -779,6 +798,7 @@ CREATE TABLE "public"."ArticleCategory" (
 -- ----------------------------
 -- Records of ArticleCategory
 -- ----------------------------
+INSERT INTO "public"."ArticleCategory" VALUES (1, '协议', NULL, 0, 't', NULL, '2025-08-15 01:30:30.115', '2025-08-15 01:30:30.115');
 
 -- ----------------------------
 -- Table structure for ArticleComment
@@ -1650,9 +1670,10 @@ INSERT INTO "public"."ForumPost" VALUES (1, '范德萨发', '<p>范德萨方的<
 INSERT INTO "public"."ForumPost" VALUES (2, 'ggg', '<p>u已经一天一天圩一天 雨天士<img src="https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/07/28/c58c668f-4cdc-4a16-a50d-527becd2b208.png" alt="" data-href="" width="" height="" style=""/></p>', 1, 't', 'f', 'f', 'f', 'PUBLISHED', 0, 20, 142, 1, NULL, '2025-07-26 07:50:32.191', '2025-08-10 17:12:57.228', 'f');
 INSERT INTO "public"."ForumPost" VALUES (6, 'fsdafsadf', '<p>2323</p>', 6, 'f', 'f', 'f', 'f', 'PENDING', 0, 0, 0, 1, NULL, '2025-08-10 17:28:16.948', '2025-08-10 17:28:16.948', 'f');
 INSERT INTO "public"."ForumPost" VALUES (7, '水岸东方撒旦法师法师', '<p>范德萨发发<span style="color: rgb(8, 151, 156);">生发水岸东方水岸东方撒范德萨范德萨发的艾师傅艾师傅</span></p><p><br></p><p><span style="color: rgb(0, 0, 0);">分挖方士大夫算法士大夫</span></p>', 5, 'f', 'f', 'f', 'f', 'PENDING', 0, 0, 0, 1, NULL, '2025-08-13 08:35:20.678', '2025-08-13 08:35:20.678', 'f');
-INSERT INTO "public"."ForumPost" VALUES (8, '新的帖子', '<p>234324324324324</p>', 5, 'f', 'f', 'f', 'f', 'PENDING', 0, 0, 0, 1, NULL, '2025-08-13 08:43:52.403', '2025-08-13 08:43:52.403', 'f');
 INSERT INTO "public"."ForumPost" VALUES (9, '新的', '<p>55555</p>', 6, 'f', 'f', 'f', 'f', 'PENDING', 0, 0, 0, 1, NULL, '2025-08-13 09:10:39.846', '2025-08-13 09:10:39.846', 'f');
 INSERT INTO "public"."ForumPost" VALUES (5, '习近平', '<p>习近平</p>', 1, 't', 't', 't', 'f', 'PUBLISHED', 0, 1, 9, 1, NULL, '2025-08-04 14:05:28.926', '2025-08-14 07:13:14.961', 'f');
+INSERT INTO "public"."ForumPost" VALUES (10, '广东省法撒旦法撒旦', '<p> 防守打法水岸东方阿斯蒂芬阿斯蒂芬水岸东方阿萨德发撒的范德萨方</p>', 1, 'f', 'f', 'f', 'f', 'PENDING', 0, 0, 0, 1, NULL, '2025-08-14 16:28:10.025', '2025-08-14 16:28:10.025', 'f');
+INSERT INTO "public"."ForumPost" VALUES (8, '新的帖子', '<p>234324324324324</p>', 5, 'f', 't', 'f', 'f', 'PENDING', 0, 0, 0, 1, NULL, '2025-08-13 08:43:52.403', '2025-08-14 16:29:41.578', 'f');
 
 -- ----------------------------
 -- Table structure for ForumPostFavorite
@@ -1738,7 +1759,7 @@ INSERT INTO "public"."ForumSection" VALUES (8, '网络游戏', '网络游戏网�
 INSERT INTO "public"."ForumSection" VALUES (10, '手机游戏', '手机游戏手机游戏', NULL, 4, 12, '2025-08-04 13:19:51.966', '2025-08-04 13:19:51.966', 0, 0, 6, '手机游戏', 0, '2025-08-04 13:19:51.966');
 INSERT INTO "public"."ForumSection" VALUES (6, '游戏', '游戏', NULL, 4, 2, '2025-07-30 13:46:05.859', '2025-08-04 13:21:11.563', 1, 0, NULL, '游戏游戏游戏游戏', 1, '2025-08-04 13:21:53.175');
 INSERT INTO "public"."ForumSection" VALUES (1, '白帽子技术/思路', '白帽子分享技术/思路的地方。
-欢迎各路豪杰加入i春秋 战国微信群（秦楚齐燕赵魏韩）添加VX：h0XT0nh0u 开启江湖征程！', NULL, 2, 6, '2025-07-26 03:04:01.798', '2025-08-13 09:10:40.089', 7, 0, NULL, NULL, 1, '2025-08-13 09:10:40.091');
+欢迎各路豪杰加入i春秋 战国微信群（秦楚齐燕赵魏韩）添加VX：h0XT0nh0u 开启江湖征程！', NULL, 2, 6, '2025-07-26 03:04:01.798', '2025-08-14 16:28:10.213', 8, 0, NULL, NULL, 1, '2025-08-14 16:28:10.214');
 
 -- ----------------------------
 -- Table structure for ForumSectionFavorite
@@ -1849,6 +1870,8 @@ INSERT INTO "public"."Order" VALUES ('cmdx58xiv0001uq5w3gwseg5i', 'TASK_17543139
 INSERT INTO "public"."Order" VALUES ('cmdx5t22r0001uqb4juz4t3yj', 'POINTS_1754314918082_2zumdp9n8', 'RECHARGE', '积分增加 - 333', 100.00, 'PAID', 'BALANCE', NULL, NULL, NULL, NULL, 12, NULL, NULL, '管理员操作：333', '2025-08-04 13:41:58.083', '2025-08-04 13:41:58.083', '2025-08-05 13:41:58.082', '{"type": "points_change", "change": 100, "reason": "333", "operator": 1, "operatorName": "admin"}');
 INSERT INTO "public"."Order" VALUES ('cmdx5texh0003uqb4z9nkpsz7', 'POINTS_1754314934741_rfny7jdxw', 'RECHARGE', '积分减少 - ss', 104.00, 'PAID', 'BALANCE', NULL, NULL, NULL, NULL, 12, NULL, NULL, '管理员操作：ss', '2025-08-04 13:42:14.742', '2025-08-04 13:42:14.742', '2025-08-05 13:42:14.741', '{"type": "points_change", "change": -104, "reason": "ss", "operator": 1, "operatorName": "admin"}');
 INSERT INTO "public"."Order" VALUES ('cme9uhgdm0014uq44xm6jlbq1', 'TASK_1755081961257_my1vk2c9l', 'TASK', '任务发布 - 标题1', 100.00, 'PAID', 'BALANCE', NULL, NULL, NULL, NULL, 6, NULL, 6, '发布任务：标题1', '2025-08-13 10:46:01.258', '2025-08-13 10:46:01.258', '2025-09-12 10:46:01.257', NULL);
+INSERT INTO "public"."Order" VALUES ('cmeb414c60001uqo0v2yiik6j', 'TASK_1755158461492_j7hjsw02m', 'TASK', '任务发布 - 包体2', 55.00, 'PAID', 'BALANCE', NULL, NULL, NULL, NULL, 1, NULL, 7, '发布任务：包体2', '2025-08-14 08:01:01.495', '2025-08-14 08:01:01.495', '2025-09-13 08:01:01.493', NULL);
+INSERT INTO "public"."Order" VALUES ('cmeblp2100001uqysjsvntfg9', 'Gl9PL0dEpI9o150XX3zv', 'RECHARGE', '充值10元', 1000.00, 'PAID', 'ALIPAY', '2025-08-14 16:16:04.613', NULL, NULL, NULL, 1, NULL, NULL, NULL, '2025-08-14 16:15:31.714', '2025-08-14 16:16:04.615', '2025-09-13 16:15:31.711', NULL);
 
 -- ----------------------------
 -- Table structure for Permission
@@ -2081,19 +2104,21 @@ CREATE TABLE "public"."Task" (
   "rejectReason" text COLLATE "pg_catalog"."default",
   "completedAt" timestamp(3),
   "createdAt" timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" timestamp(3) NOT NULL
+  "updatedAt" timestamp(3) NOT NULL,
+  "noNeedMeConfirmed" bool NOT NULL DEFAULT true
 )
 ;
 
 -- ----------------------------
 -- Records of Task
 -- ----------------------------
-INSERT INTO "public"."Task" VALUES (1, 1, 1, '防守打法撒法撒旦法', '范德萨发发发范德萨发水岸东方士大夫', 'APPROVED', 100, 'f', 'f', 'f', 57, '[]', NULL, NULL, '2025-07-27 09:56:07.777', '2025-08-04 13:27:34.817');
-INSERT INTO "public"."Task" VALUES (4, 1, 1, '任务测试', '<p>任务测试任务测试任务测试<img src="https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/03/e80e513f-6319-4489-8a5e-ea7a796ed742.png" alt="" data-href="" width="" height="" style=""/></p>', 'IN_PROGRESS', 100, 'f', 'f', 'f', 32, '[]', NULL, NULL, '2025-08-03 13:52:34.328', '2025-08-13 20:04:15.059');
-INSERT INTO "public"."Task" VALUES (2, 5, 1, '版本', '法撒旦 奥德赛sad发', 'PENDING', 100, 'f', 't', 'f', 0, '[]', NULL, NULL, '2025-07-28 14:31:39.598', '2025-07-28 14:53:21.757');
-INSERT INTO "public"."Task" VALUES (5, 1, 1, '测试任务', '<p>对对对</p>', 'PENDING', 100, 'f', 'f', 'f', 0, '[{"url": "https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/04/246e0595-fcb6-4bf2-951a-cad496f17fa2.png", "name": "3DLogoLab.png"}]', NULL, NULL, '2025-08-04 13:26:19.008', '2025-08-04 13:26:19.008');
-INSERT INTO "public"."Task" VALUES (6, 6, 3, '标题1', '<p>标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1</p>', 'APPROVED', 1003, 't', 'f', 'f', 10, '["https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/videos/2025/08/14/ec4ecd4e-6ce8-4f1d-aa34-c2bfc37dccf3.mp4"]', '范德萨发发士大夫', NULL, '2025-08-13 10:46:01.195', '2025-08-14 07:43:01.949');
-INSERT INTO "public"."Task" VALUES (3, 1, 2, '范德萨发', '<p><br></p><p><br></p><table style="width: auto; table-layout: fixed; height: 0px; border-width: 0px;"><colgroup contenteditable="false"><col width="NaN"></colgroup><tbody><tr><td colspan="1" rowspan="1" width="auto" style="border-width: 0px; border-style: solid; border-color: rgb(204, 204, 204);"><p>最近开始正式挖洞了，也是选择从相对来说比较简单的edusrc开始挖，后续准备挖公益然后企业等。都说信息收集决定了挖洞的下限。所以说信息收集相对来说是非常重要的，接下来我想分享一下我对edu信息收集的一些理解，edu和企业src那些收集思路还是有差别的。<br><br>[C] <span style="font-size: 12px;"><em>纯文本查看</em></span> <span style="font-size: 12px;"><em>复制代码<br><br><br></em></span>?</p></td></tr></tbody></table><table style="width: auto; table-layout: fixed; height: 0px; border-width: 0px;"><colgroup contenteditable="false"><col width="40"><col width="NaN"></colgroup><tbody><tr><td colspan="1" rowspan="1" width="auto" style="border-width: 0px; border-style: solid; border-color: rgb(204, 204, 204);"><p>1</p><p>2</p><p>3</p></td><td colspan="1" rowspan="1" width="auto" style="border-width: 0px; border-style: solid; border-color: rgb(204, 204, 204);"><p>edusrc地址:[url]https://src.sjtu.edu.cn/[/url]刚开始大家可能没有账号，获得账号有两个方式。第一个是提交一个有效的漏洞，通过后就可以获得账号了。第二个是填写邀请码，一般社区会不定时发放。//我也是这种方式进的<br><img src="https://bbs.ichunqiu.com/data/attachment/forum/202311/17/020452oslwfvi4gzfnsgyn.png.thumb.jpg" alt="" data-href="" width="" height="" style=""></p></td></tr></tbody></table><p><br></p>', 'APPROVED', 10064563, 'f', 'f', 'f', 21, '["https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/03/268607fa-a0f1-41b6-af64-e09abc2c1358.png", "https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/03/fc74a1f8-d587-4dd7-ad10-7b4da2495e5a.png"]', '辅导费地方亲亲，辛苦您稍等，小二马上去查看一下。发斯蒂芬艾师傅艾师傅艾师傅', NULL, '2025-07-29 14:08:55.824', '2025-08-14 07:19:24.68');
+INSERT INTO "public"."Task" VALUES (1, 1, 1, '防守打法撒法撒旦法', '范德萨发发发范德萨发水岸东方士大夫', 'APPROVED', 100, 'f', 'f', 'f', 57, '[]', NULL, NULL, '2025-07-27 09:56:07.777', '2025-08-04 13:27:34.817', 'f');
+INSERT INTO "public"."Task" VALUES (2, 5, 1, '版本', '法撒旦 奥德赛sad发', 'PENDING', 100, 'f', 't', 'f', 0, '[]', NULL, NULL, '2025-07-28 14:31:39.598', '2025-07-28 14:53:21.757', 'f');
+INSERT INTO "public"."Task" VALUES (5, 1, 1, '测试任务', '<p>对对对</p>', 'REJECTED', 100, 'f', 't', 't', 4, '[]', '发撒的发撒的发士大夫水岸东方水岸东方士大夫水岸东方士大夫', '2025-08-22 23:06:00', '2025-08-04 13:26:19.008', '2025-08-14 09:43:57.438', 'f');
+INSERT INTO "public"."Task" VALUES (7, 1, 2, '包体2', '<p>包体2包体2包体2包体2<img src="https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/14/ee7a4612-3a3a-453f-8b8b-f8d9243b2d8a.jpeg" alt="" data-href="" width="" height="" style="width: 350.00px;height: 350.00px;"/></p><p><br></p><p>发撒的发生发生发生方艾师傅</p>', 'PENDING', 55, 'f', 't', 'f', 25, '[{"url": "https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/14/88229789-aa8f-4888-bf09-19c651b1a4a6.jpeg", "name": "7b1ddde7-123a-4a39-bea4-f27f6cf351a6 (1).jpeg"}]', NULL, NULL, '2025-08-14 08:01:01.438', '2025-08-14 09:40:04.572', 'f');
+INSERT INTO "public"."Task" VALUES (4, 1, 1, '任务测试', '<p>任务测试任务测试任务测试<img src="https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/03/e80e513f-6319-4489-8a5e-ea7a796ed742.png" alt="" data-href="" width="" height="" style=""/></p>', 'ADMIN_CONFIRMED', 100, 'f', 'f', 'f', 32, '[]', NULL, NULL, '2025-08-03 13:52:34.328', '2025-08-14 16:23:44.05', 'f');
+INSERT INTO "public"."Task" VALUES (6, 6, 3, '标题1', '<p>标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1标题1</p>', 'COMPLETED', 1003, 't', 'f', 'f', 12, '["https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/videos/2025/08/14/ec4ecd4e-6ce8-4f1d-aa34-c2bfc37dccf3.mp4"]', '范德萨发发士大夫', NULL, '2025-08-13 10:46:01.195', '2025-08-14 16:25:48.946', 'f');
+INSERT INTO "public"."Task" VALUES (3, 1, 2, '范德萨发', '<p><br></p><p><br></p><table style="width: auto; table-layout: fixed; height: 0px; border-width: 0px;"><colgroup contenteditable="false"><col width="NaN"></colgroup><tbody><tr><td colspan="1" rowspan="1" width="auto" style="border-width: 0px; border-style: solid; border-color: rgb(204, 204, 204);"><p>最近开始正式挖洞了，也是选择从相对来说比较简单的edusrc开始挖，后续准备挖公益然后企业等。都说信息收集决定了挖洞的下限。所以说信息收集相对来说是非常重要的，接下来我想分享一下我对edu信息收集的一些理解，edu和企业src那些收集思路还是有差别的。<br><br>[C] <span style="font-size: 12px;"><em>纯文本查看</em></span> <span style="font-size: 12px;"><em>复制代码<br><br><br></em></span>?</p></td></tr></tbody></table><table style="width: auto; table-layout: fixed; height: 0px; border-width: 0px;"><colgroup contenteditable="false"><col width="40"><col width="NaN"></colgroup><tbody><tr><td colspan="1" rowspan="1" width="auto" style="border-width: 0px; border-style: solid; border-color: rgb(204, 204, 204);"><p>1</p><p>2</p><p>3</p></td><td colspan="1" rowspan="1" width="auto" style="border-width: 0px; border-style: solid; border-color: rgb(204, 204, 204);"><p>edusrc地址:[url]https://src.sjtu.edu.cn/[/url]刚开始大家可能没有账号，获得账号有两个方式。第一个是提交一个有效的漏洞，通过后就可以获得账号了。第二个是填写邀请码，一般社区会不定时发放。//我也是这种方式进的<br><img src="https://bbs.ichunqiu.com/data/attachment/forum/202311/17/020452oslwfvi4gzfnsgyn.png.thumb.jpg" alt="" data-href="" width="" height="" style=""></p></td></tr></tbody></table><p><br></p>', 'PUBLISHER_CONFIRMED', 12520, 'f', 'f', 'f', 30, '["https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/03/268607fa-a0f1-41b6-af64-e09abc2c1358.png", "https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/03/fc74a1f8-d587-4dd7-ad10-7b4da2495e5a.png"]', '辅导费地方亲亲，辛苦您稍等，小二马上去查看一下。发斯蒂芬艾师傅艾师傅艾师傅', '2025-08-29 18:08:24', '2025-07-29 14:08:55.824', '2025-08-14 12:14:37.353', 'f');
 
 -- ----------------------------
 -- Table structure for TaskApplication
@@ -2115,6 +2140,7 @@ INSERT INTO "public"."TaskApplication" VALUES (1, 5, 1, '2025-07-27 10:48:05.733
 INSERT INTO "public"."TaskApplication" VALUES (2, 5, 4, '2025-08-04 13:28:39.854', NULL);
 INSERT INTO "public"."TaskApplication" VALUES (3, 6, 4, '2025-08-13 19:35:47.234', 'fdsafadsf');
 INSERT INTO "public"."TaskApplication" VALUES (4, 1, 6, '2025-08-14 07:20:26.399', '5555');
+INSERT INTO "public"."TaskApplication" VALUES (5, 6, 3, '2025-08-14 10:00:11.534', 'FSADFASDFASFDASD');
 
 -- ----------------------------
 -- Table structure for TaskAssignment
@@ -2136,6 +2162,7 @@ CREATE TABLE "public"."TaskAssignment" (
 -- Records of TaskAssignment
 -- ----------------------------
 INSERT INTO "public"."TaskAssignment" VALUES (1, 4, 6, '2025-08-13 19:42:41.258', NULL, NULL, '2025-08-13 19:42:41.259', '2025-08-13 19:42:41.259');
+INSERT INTO "public"."TaskAssignment" VALUES (2, 3, 6, '2025-08-14 10:00:44.531', 'gfdsgdsfsdafsadf', '[{"url": "https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/14/7af01901-0cda-4674-aefe-92c8262fc77d.octet-stream", "name": "localhost-body-1755046532.pen"}]', '2025-08-14 10:00:44.533', '2025-08-14 10:29:08.812');
 
 -- ----------------------------
 -- Table structure for TaskCategory
@@ -2285,8 +2312,8 @@ INSERT INTO "public"."User" VALUES (5, '测试用户23', '19296393616', '$argon2
 INSERT INTO "public"."User" VALUES (2, '测试用户13', '14215571240', '$argon2id$v=19$m=65536,t=3,p=4$S787qUxC2lhkz043zT2v1Q$bEl98ScRqxJ5D/ncmiQdJ7haQ/Pj2WWRTC1amu7L0qY', NULL, '/default-avatar.png', 'USER', 'INACTIVE', 6, '::1', NULL, NULL, NULL, 0, 0, '2025-07-21 15:26:58.15', '2025-08-04 13:43:31.136', '2025-08-03 11:07:31.411', 0);
 INSERT INTO "public"."User" VALUES (15, 'ttt', '15669041216', '$argon2id$v=19$m=65536,t=3,p=4$bMjkWkO6D9TxKwdQvspCaA$tR+/Kh3xT3OuY+dSnayDuZU6oN407uQ0su5GBBvkUmo', 'admin23@qq2.com', '/default-avatar.png', 'ADMIN', 'ACTIVE', 0, NULL, NULL, NULL, NULL, 0, 0, '2025-08-10 13:01:57.989', '2025-08-10 13:28:43.129', '2025-08-10 13:01:57.989', 0);
 INSERT INTO "public"."User" VALUES (7, 'admin1', '', '$argon2id$v=19$m=65536,t=3,p=4$xtaja8iqEY66xyaTv1PUWQ$uCt28NI56vUFithkRbKLQtEf5ia8gc2EehlHzJ2xh8M', 'admin@qq.com', '/default-avatar.png', 'SUPER_ADMIN', 'ACTIVE', 0, NULL, NULL, NULL, NULL, 0, 0, '2025-07-30 13:11:07.78', '2025-07-30 13:11:07.78', '2025-07-30 13:11:07.78', 0);
-INSERT INTO "public"."User" VALUES (6, '测试用户33', '17241296983', '$argon2id$v=19$m=65536,t=3,p=4$vFbkk59I+IDcC3rRLTn9Vw$bUvDYqAMPll7EdEQGmtTINOrNmiohV+f/jz7ZhPA7vU', NULL, '/default-avatar.png', 'USER', 'ACTIVE', 11, '::1', NULL, NULL, NULL, 2253634, 0, '2025-07-22 13:11:12.344', '2025-08-13 19:35:21.034', '2025-08-13 19:35:21.031', 0);
-INSERT INTO "public"."User" VALUES (1, 'admin', '15755442378', '$argon2id$v=19$m=65536,t=3,p=4$QQFOiSEO9IkvSJ49PL/9kA$Zs4l9yMPUdBuFSOsJ13rgch2pV27UMF0NvSEYwx+FzQ', 'admin@example.com', 'https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/03/0cd76aab-5302-4d78-8c6e-e8cb1d09d588.jpeg', 'SUPER_ADMIN', 'ACTIVE', 56, '::1', '割发代首割发代首方阿斯蒂芬大', NULL, NULL, 17171, 0, '2025-07-18 00:00:00', '2025-08-14 07:15:06.215', '2025-08-14 07:15:06.213', 0);
+INSERT INTO "public"."User" VALUES (6, '测试用户33', '17241296983', '$argon2id$v=19$m=65536,t=3,p=4$vFbkk59I+IDcC3rRLTn9Vw$bUvDYqAMPll7EdEQGmtTINOrNmiohV+f/jz7ZhPA7vU', NULL, '/default-avatar.png', 'USER', 'ACTIVE', 12, '::1', NULL, NULL, NULL, 2253634, 0, '2025-07-22 13:11:12.344', '2025-08-14 09:51:20.493', '2025-08-14 09:51:20.491', 0);
+INSERT INTO "public"."User" VALUES (1, 'admin', '15755442378', '$argon2id$v=19$m=65536,t=3,p=4$QQFOiSEO9IkvSJ49PL/9kA$Zs4l9yMPUdBuFSOsJ13rgch2pV27UMF0NvSEYwx+FzQ', 'admin@example.com', 'https://study-platform-1258739349.cos.ap-guangzhou.myqcloud.com/uploads/images/2025/08/03/0cd76aab-5302-4d78-8c6e-e8cb1d09d588.jpeg', 'SUPER_ADMIN', 'ACTIVE', 58, '::1', '割发代首割发代首方阿斯蒂芬大', NULL, NULL, 17271, 0, '2025-07-18 00:00:00', '2025-08-14 15:45:35.727', '2025-08-14 15:45:35.725', 0);
 INSERT INTO "public"."User" VALUES (16, 'wzq', '15669041256', '$argon2id$v=19$m=65536,t=3,p=4$KEK8Vop675q5t+CQi5Oz6Q$3Ex6t4016ybFcwmfRFKp23c7bZMLtoiHYXkSridAuek', 'wzqwzqwzq@qq.com', '/default-avatar.png', 'ADMIN', 'ACTIVE', 3, NULL, NULL, NULL, NULL, 0, 0, '2025-08-10 15:26:49.875', '2025-08-13 07:40:45.832', '2025-08-10 15:39:12.169', 0);
 
 -- ----------------------------
@@ -2348,11 +2375,37 @@ INSERT INTO "public"."VerificationCode" VALUES ('cmdx5i0000002uq5waz700gqt', '15
 INSERT INTO "public"."VerificationCode" VALUES ('cme9nuv8a000uuq44rbiv74h1', '15669041256', '666666', '2025-08-13 07:50:29.693', 'reset_password', 't', '2025-08-13 07:40:29.695', '2025-08-13 07:40:45.892');
 
 -- ----------------------------
+-- Table structure for WithdrawRecord
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."WithdrawRecord";
+CREATE TABLE "public"."WithdrawRecord" (
+  "id" int4 NOT NULL DEFAULT nextval('"WithdrawRecord_id_seq"'::regclass),
+  "taskId" int4 NOT NULL,
+  "userId" int4 NOT NULL,
+  "amount" float8 NOT NULL,
+  "actualAmount" float8 NOT NULL,
+  "fee" float8 NOT NULL,
+  "accountType" text COLLATE "pg_catalog"."default" NOT NULL,
+  "accountInfo" jsonb NOT NULL,
+  "status" text COLLATE "pg_catalog"."default" NOT NULL,
+  "alipayOrderId" text COLLATE "pg_catalog"."default",
+  "alipayResponse" jsonb,
+  "createdAt" timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" timestamp(3) NOT NULL
+)
+;
+
+-- ----------------------------
+-- Records of WithdrawRecord
+-- ----------------------------
+INSERT INTO "public"."WithdrawRecord" VALUES (1, 3, 6, 12520, 11268, 1252, 'alipay', '{"account": "ypwuvr9165@sandbox.com", "realName": "ypwuvr9165"}', 'PROCESSING', '1755179017536', '{}', '2025-08-14 13:43:37.537', '2025-08-14 13:43:37.538');
+
+-- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."ArticleCategory_id_seq"
 OWNED BY "public"."ArticleCategory"."id";
-SELECT setval('"public"."ArticleCategory_id_seq"', 2, false);
+SELECT setval('"public"."ArticleCategory_id_seq"', 2, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -2373,7 +2426,7 @@ SELECT setval('"public"."ArticleComment_id_seq"', 2, false);
 -- ----------------------------
 ALTER SEQUENCE "public"."Article_id_seq"
 OWNED BY "public"."Article"."id";
-SELECT setval('"public"."Article_id_seq"', 2, false);
+SELECT setval('"public"."Article_id_seq"', 5, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -2548,7 +2601,7 @@ SELECT setval('"public"."ForumPostReport_id_seq"', 2, true);
 -- ----------------------------
 ALTER SEQUENCE "public"."ForumPost_id_seq"
 OWNED BY "public"."ForumPost"."id";
-SELECT setval('"public"."ForumPost_id_seq"', 10, true);
+SELECT setval('"public"."ForumPost_id_seq"', 11, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -2618,14 +2671,14 @@ SELECT setval('"public"."SystemNotification_id_seq"', 2, false);
 -- ----------------------------
 ALTER SEQUENCE "public"."TaskApplication_id_seq"
 OWNED BY "public"."TaskApplication"."id";
-SELECT setval('"public"."TaskApplication_id_seq"', 5, true);
+SELECT setval('"public"."TaskApplication_id_seq"', 6, true);
 
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."TaskAssignment_id_seq"
 OWNED BY "public"."TaskAssignment"."id";
-SELECT setval('"public"."TaskAssignment_id_seq"', 2, true);
+SELECT setval('"public"."TaskAssignment_id_seq"', 3, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -2667,7 +2720,7 @@ SELECT setval('"public"."TaskLike_id_seq"', 3, true);
 -- ----------------------------
 ALTER SEQUENCE "public"."Task_id_seq"
 OWNED BY "public"."Task"."id";
-SELECT setval('"public"."Task_id_seq"', 7, true);
+SELECT setval('"public"."Task_id_seq"', 8, true);
 
 -- ----------------------------
 -- Alter sequences owned by
@@ -2689,6 +2742,13 @@ SELECT setval('"public"."UserRoleRelation_id_seq"', 9, true);
 ALTER SEQUENCE "public"."User_id_seq"
 OWNED BY "public"."User"."id";
 SELECT setval('"public"."User_id_seq"', 17, true);
+
+-- ----------------------------
+-- Alter sequences owned by
+-- ----------------------------
+ALTER SEQUENCE "public"."WithdrawRecord_id_seq"
+OWNED BY "public"."WithdrawRecord"."id";
+SELECT setval('"public"."WithdrawRecord_id_seq"', 2, true);
 
 -- ----------------------------
 -- Indexes structure for table Article
@@ -3385,6 +3445,10 @@ ALTER TABLE "public"."Task" ADD CONSTRAINT "Task_pkey" PRIMARY KEY ("id");
 CREATE INDEX "TaskApplication_applicantId_idx" ON "public"."TaskApplication" USING btree (
   "applicantId" "pg_catalog"."int4_ops" ASC NULLS LAST
 );
+CREATE UNIQUE INDEX "TaskApplication_taskId_applicantId_key" ON "public"."TaskApplication" USING btree (
+  "taskId" "pg_catalog"."int4_ops" ASC NULLS LAST,
+  "applicantId" "pg_catalog"."int4_ops" ASC NULLS LAST
+);
 CREATE INDEX "TaskApplication_taskId_idx" ON "public"."TaskApplication" USING btree (
   "taskId" "pg_catalog"."int4_ops" ASC NULLS LAST
 );
@@ -3561,6 +3625,27 @@ CREATE INDEX "VerificationCode_phone_expiresAt_idx" ON "public"."VerificationCod
 -- Primary Key structure for table VerificationCode
 -- ----------------------------
 ALTER TABLE "public"."VerificationCode" ADD CONSTRAINT "VerificationCode_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Indexes structure for table WithdrawRecord
+-- ----------------------------
+CREATE INDEX "WithdrawRecord_createdAt_idx" ON "public"."WithdrawRecord" USING btree (
+  "createdAt" "pg_catalog"."timestamp_ops" ASC NULLS LAST
+);
+CREATE INDEX "WithdrawRecord_status_idx" ON "public"."WithdrawRecord" USING btree (
+  "status" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+);
+CREATE INDEX "WithdrawRecord_taskId_idx" ON "public"."WithdrawRecord" USING btree (
+  "taskId" "pg_catalog"."int4_ops" ASC NULLS LAST
+);
+CREATE INDEX "WithdrawRecord_userId_idx" ON "public"."WithdrawRecord" USING btree (
+  "userId" "pg_catalog"."int4_ops" ASC NULLS LAST
+);
+
+-- ----------------------------
+-- Primary Key structure for table WithdrawRecord
+-- ----------------------------
+ALTER TABLE "public"."WithdrawRecord" ADD CONSTRAINT "WithdrawRecord_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Foreign Keys structure for table Article
@@ -3802,3 +3887,9 @@ ALTER TABLE "public"."UserMessage" ADD CONSTRAINT "UserMessage_userId_fkey" FORE
 -- ----------------------------
 ALTER TABLE "public"."UserRoleRelation" ADD CONSTRAINT "UserRoleRelation_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "public"."Role" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "public"."UserRoleRelation" ADD CONSTRAINT "UserRoleRelation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ----------------------------
+-- Foreign Keys structure for table WithdrawRecord
+-- ----------------------------
+ALTER TABLE "public"."WithdrawRecord" ADD CONSTRAINT "WithdrawRecord_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "public"."Task" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."WithdrawRecord" ADD CONSTRAINT "WithdrawRecord_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;

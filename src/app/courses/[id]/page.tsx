@@ -81,7 +81,7 @@ const LoginRequired = () => {
   return (
     <div className="absolute inset-0 bg-black/80 backdrop-blur flex flex-col items-center justify-center text-center z-10">
       <FiLock className="text-4xl text-cyan-500 mb-4" />
-      <h3 className="text-xl mb-2">本门课程为收费课程</h3>
+      <h3 className="text-xl mb-2 text-white">本门课程为收费课程</h3>
       <p className="text-gray-400 mb-6">您需要登录后才能观看</p>
       <button
         onClick={() => router.push('/login')}

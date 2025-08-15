@@ -30,7 +30,6 @@ export async function GET(
     const task = await prisma.task.findUnique({
       where: {
         id: taskId,
-        isDeleted: false,
       },
       select: {
         id: true,
