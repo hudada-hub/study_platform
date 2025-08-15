@@ -565,12 +565,12 @@ const PublishTaskPage: React.FC = () => {
                   <div className="flex items-center justify-between w-full">
                     <span className="flex-1 truncate">{file.name}</span>
                     <div className="flex items-center gap-2">
-                      {file.status === 'uploading' && (
+                    {file.status === 'uploading' && (
                         <span className="text-blue-500 text-xs">
-                          上传中... {Math.round(file.percent || 0)}%
-                        </span>
-                      )}
-                      {file.status === 'done' && (
+                        上传中... {Math.round(file.percent || 0)}%
+                      </span>
+                    )}
+                    {file.status === 'done' && (
                         <>
                           <span className="text-green-500 text-xs">✓ 完成</span>
                           <Button
@@ -585,10 +585,10 @@ const PublishTaskPage: React.FC = () => {
                             下载
                           </Button>
                         </>
-                      )}
-                      {file.status === 'error' && (
+                    )}
+                    {file.status === 'error' && (
                         <span className="text-red-500 text-xs">✗ 失败</span>
-                      )}
+                    )}
                       <Button
                         type="text"
                         size="small"

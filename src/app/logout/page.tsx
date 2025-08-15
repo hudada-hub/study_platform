@@ -17,7 +17,7 @@ const LogoutPage = () => {
     if (currentPath !== '/logout') {
       window.location.href = currentPath;
     } else {
-      router.push('/');
+    router.push('/');
     }
   }, [router]);
 
