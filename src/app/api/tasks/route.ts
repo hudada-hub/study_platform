@@ -33,8 +33,13 @@ export async function GET(request: NextRequest) {
       where.categoryId = parseInt(categoryId);
     }
 
-    // 状态筛选 - 如果没有指定状态，默认显示已通过的任务
-    if (status) {
+    // 状态筛选 - 如果没有指定状态，默认显示已通过的任务FR
+    if (status === 'all') {
+      // 显示4种状态的任务：已通过、执行中、已完成、管理员已确认
+      where.status = {
+        in: ['APPROVED', 'IN_PROGRESS', 'COMPLETED', 'ADMIN_CONFIRMED']
+      };
+    } else if (status) {
       where.status = status;
     } else {
       // 默认只显示已通过审核的任务

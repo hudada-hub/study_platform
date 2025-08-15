@@ -49,7 +49,7 @@ const TaskPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>('APPROVED'); // 默认选中发布中任务
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [categories, setCategories] = useState<TaskCategory[]>([]);
@@ -104,12 +104,16 @@ const TaskPage: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [currentPage, pageSize, searchKeyword, selectedCategory, selectedStatus, sortBy, sortOrder]);
+  }, [currentPage, pageSize, selectedCategory, selectedStatus, sortBy, sortOrder]);
 
   // 处理搜索
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
     setCurrentPage(1);
+    // 立即执行搜索，获取搜索结果
+    setTimeout(() => {
+      fetchTasks();
+    }, 0);
   };
 
   // 处理分类筛选
@@ -120,7 +124,9 @@ const TaskPage: React.FC = () => {
 
   // 处理状态筛选
   const handleStatusChange = (value: string | null) => {
-    setSelectedStatus(value);
+    // 如果选择"全部"，则传递'all'，否则传递具体状态值
+    const statusValue = value === null ? 'all' : value;
+    setSelectedStatus(statusValue);
     setCurrentPage(1);
   };
 
@@ -198,14 +204,22 @@ const TaskPage: React.FC = () => {
             <div className="flex-1 min-w-64">
               <Input
                 placeholder="搜索任务标题或内容"
-                prefix={loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-500"></div> : <SearchOutlined />}
+                prefix={<SearchOutlined />}
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 onPressEnter={(e) => handleSearch((e.target as HTMLInputElement).value)}
                 allowClear
-                disabled={loading}
+                onClear={() => handleSearch('')}
               />
             </div>
+            <Button 
+              type="primary" 
+              icon={<SearchOutlined />}
+              onClick={() => handleSearch(searchKeyword)}
+              disabled={loading}
+            >
+              搜索
+            </Button>
             <Button 
               type="primary" 
               icon={<PlusOutlined />}
@@ -214,7 +228,7 @@ const TaskPage: React.FC = () => {
             >
               发布任务
             </Button>
-            </div>
+          </div>
 
           {/* 第二排：任务分类 */}
           <div className="flex items-center gap-2">
@@ -255,7 +269,7 @@ const TaskPage: React.FC = () => {
               <button
                 onClick={() => handleStatusChange(null)}
                 className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  selectedStatus === null
+                  selectedStatus === 'all'
                     ? 'bg-cyan-500 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -429,6 +443,22 @@ const TaskPage: React.FC = () => {
         {/* 空状态 */}
         {!loading && tasks.length === 0 && (
           <div className="text-center py-12">
+            <div className="mb-4">
+              <svg
+                className="mx-auto h-24 w-24 text-gray-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                />
+              </svg>
+            </div>
             <div className="text-gray-400 text-lg mb-2">暂无任务</div>
             <p className="text-gray-500">试试调整筛选条件或发布新任务</p>
           </div>
