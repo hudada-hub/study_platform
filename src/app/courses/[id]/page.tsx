@@ -299,6 +299,13 @@ const CoursePage = () => {
 
       if (createOrderRes.code === 0) {
         setHasPurchasedCourse(true);
+        
+        // 支付成功后刷新用户信息，更新积分显示
+        if (typeof window !== 'undefined') {
+          // 触发全局用户信息刷新
+          window.dispatchEvent(new CustomEvent('refreshUserInfo'));
+        }
+        
         Swal.fire({
           icon: 'success',
           title: '购买成功',
@@ -328,6 +335,12 @@ const CoursePage = () => {
       if (createOrderRes.code === 0) {
         setHasPurchased(true);
         setChapterVideoUrl(createOrderRes.data?.videoUrl || null);
+        
+        // 支付成功后刷新用户信息，更新积分显示
+        if (typeof window !== 'undefined') {
+          // 触发全局用户信息刷新
+          window.dispatchEvent(new CustomEvent('refreshUserInfo'));
+        }
       } else {
         throw new Error(createOrderRes.message);
       }

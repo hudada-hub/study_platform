@@ -32,7 +32,7 @@ export const defaultTheme: ThemeConfig = {
   errorColor: '#ff4d4f',
   infoColor: '#1890ff',
   textColor: {
-    primary: '#333',
+    primary: 'rgb(0,185,219)',
     secondary: '#00000073',
     disabled: '#00000040',
   },
@@ -42,7 +42,7 @@ export const defaultTheme: ThemeConfig = {
     light: '#f5f5f5',
   },
   borderColor: {
-    primary: '#d9d9d9',
+    primary: 'rgb(0,185,219)',
     secondary: '#f0f0f0',
   },
 }; 

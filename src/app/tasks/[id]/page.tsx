@@ -158,6 +158,11 @@ const TaskDetailPage: React.FC = () => {
       });
       
       if (ResponseUtil.success(response)) {
+        // 接单成功后刷新用户信息，更新积分显示
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('refreshUserInfo'));
+        }
+        
         Swal.fire({
           icon: 'success',
           title: '报名成功',
@@ -508,7 +513,8 @@ const TaskDetailPage: React.FC = () => {
               icon={task.hasLiked ? <HeartFilled /> : <HeartOutlined />}
               onClick={handleLike}
               loading={liking}
-              className={task.hasLiked ? 'text-red-500' : ''}
+              type={task.hasLiked ? 'primary' : 'default'}
+              className={task.hasLiked ? 'bg-cyan-500 border-cyan-500 text-white hover:bg-cyan-600 hover:border-cyan-600' : ''}
             >
               {task.hasLiked ? '已点赞' : '点赞'} ({task.likeCount})
             </Button>
@@ -517,7 +523,8 @@ const TaskDetailPage: React.FC = () => {
               icon={task.hasFavorited ? <StarFilled /> : <StarOutlined />}
               onClick={handleFavorite}
               loading={favoriting}
-              className={task.hasFavorited ? 'text-yellow-500' : ''}
+              type={task.hasFavorited ? 'primary' : 'default'}
+              className={task.hasFavorited ? 'bg-cyan-500 border-cyan-500 text-white hover:bg-cyan-600 hover:border-cyan-600' : ''}
             >
               {task.hasFavorited ? '已收藏' : '收藏'} ({task.favoriteCount})
             </Button>

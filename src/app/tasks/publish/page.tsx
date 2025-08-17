@@ -13,12 +13,15 @@ import {
   Upload,
   Space,
   Divider,
-  DatePicker
+  DatePicker,
+  Checkbox
 } from 'antd';
 import { 
   PlusOutlined, 
   UploadOutlined,
-  ExclamationCircleOutlined 
+  ExclamationCircleOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined
 } from '@ant-design/icons';
 import { getToken, request } from '@/utils/request';
 import { ResponseUtil } from '@/utils/response';
@@ -48,6 +51,7 @@ interface TaskFormData {
   points: number;
   completedAt?: string;
   attachments?: any[];
+  noNeedMeConfirmed?: boolean; // 添加noNeedMeConfirmed字段
 }
 
 const PublishTaskPage: React.FC = () => {
@@ -241,11 +245,13 @@ const PublishTaskPage: React.FC = () => {
         ...values, 
         completedAt: completedAtTimestamp,
         status: 'PENDING',
-        attachments: JSON.stringify(attachmentUrls || [])
+        attachments: JSON.stringify(attachmentUrls || []),
+        noNeedMeConfirmed: values.noNeedMeConfirmed || false // 添加noNeedMeConfirmed字段
       } : {
         ...values,
         completedAt: completedAtTimestamp,
-        attachments: JSON.stringify(attachmentUrls || [])
+        attachments: JSON.stringify(attachmentUrls || []),
+        noNeedMeConfirmed: values.noNeedMeConfirmed || false // 添加noNeedMeConfirmed字段
       };
       
       console.log('最终提交数据:', submitData);
@@ -259,6 +265,11 @@ const PublishTaskPage: React.FC = () => {
       });
       
       if (ResponseUtil.success(response)) {
+        // 任务发布成功后刷新用户信息，更新积分显示
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('refreshUserInfo'));
+        }
+        
         Swal.fire({
           icon: 'success',
           title: isEdit ? '任务更新成功' : '任务发布成功',
@@ -559,40 +570,25 @@ const PublishTaskPage: React.FC = () => {
                 onChange={handleFileListChange}
                 maxCount={5}
                 onRemove={(file) => {
-                  setFileList(prev => prev.filter(f => f.uid !== file.uid));
+                  // Antd的onRemove会在自定义remove之前调用
                 }}
                 itemRender={(originNode, file) => (
                   <div className="flex items-center justify-between w-full">
                     <span className="flex-1 truncate">{file.name}</span>
                     <div className="flex items-center gap-2">
-                    {file.status === 'uploading' && (
-                        <span className="text-blue-500 text-xs">
-                        上传中... {Math.round(file.percent || 0)}%
-                      </span>
-                    )}
-                    {file.status === 'done' && (
-                        <>
-                          <span className="text-green-500 text-xs">✓ 完成</span>
-                          <Button
-                            type="text"
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDownloadFile(file);
-                            }}
-                            className="text-blue-500 hover:text-blue-700"
-                          >
-                            下载
-                          </Button>
-                        </>
-                    )}
-                    {file.status === 'error' && (
-                        <span className="text-red-500 text-xs">✗ 失败</span>
-                    )}
-                      <Button
-                        type="text"
-                        size="small"
-                        danger
+                      {file.status === 'uploading' && (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-500"></div>
+                      )}
+                      {file.status === 'done' && (
+                        <CheckCircleOutlined className="text-green-500" />
+                      )}
+                      {file.status === 'error' && (
+                        <CloseCircleOutlined className="text-red-500" />
+                      )}
+                      <Button 
+                        type="text" 
+                        size="small" 
+                        danger 
                         onClick={(e) => {
                           e.stopPropagation();
                           handleRemoveFile(file);
@@ -601,17 +597,40 @@ const PublishTaskPage: React.FC = () => {
                       >
                         删除
                       </Button>
+                      {file.status === 'done' && (
+                        <Button 
+                          type="text" 
+                          size="small" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownloadFile(file);
+                          }}
+                          className="text-blue-500 hover:text-blue-700"
+                        >
+                          下载
+                        </Button>
+                      )}
                     </div>
                   </div>
                 )}
               >
-                <Button icon={<UploadOutlined />}>
-                  上传附件
-                </Button>
+                <Button icon={<UploadOutlined />}>上传附件</Button>
               </Upload>
               <div className="text-xs text-gray-500 mt-1">
                 支持图片、文档等格式，最大5个文件
               </div>
+            </Form.Item>
+
+            {/* 由我确认是否任务完成 */}
+            <Form.Item
+              label="任务完成确认"
+              name="noNeedMeConfirmed"
+              valuePropName="checked"
+              initialValue={false}
+            >
+              <Checkbox>
+                由我确认是否任务完成
+              </Checkbox>
             </Form.Item>
 
             <Divider />

@@ -42,7 +42,8 @@ export default function UserProfilePage() {
     // 检查用户是否已登录
     const currentUser = getCurrentUser();
     if (!currentUser) {
-      router.replace('/login');
+      // 不直接跳转，而是显示未登录状态
+      setIsLoading(false);
       return;
     }
 
@@ -52,6 +53,13 @@ export default function UserProfilePage() {
   }, [userId, router]);
 
   const loadUserProfile = async () => {
+    // 再次检查登录状态
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
@@ -79,6 +87,38 @@ export default function UserProfilePage() {
         <div className="flex flex-col items-center gap-2">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
           <p className="text-sm text-gray-500">加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 检查是否已登录
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-gray-50">
+        <div className="max-w-md w-full mx-auto p-6">
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaUser className="w-8 h-8 text-gray-400" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">需要登录</h2>
+            <p className="text-gray-600 mb-6">请先登录后查看个人资料</p>
+            <div className="space-y-3">
+              <button
+                onClick={() => router.push('/login')}
+                className="w-full bg-cyan-500 text-white py-2 px-4 rounded-md hover:bg-cyan-600 transition-colors"
+              >
+                立即登录
+              </button>
+              <button
+                onClick={() => router.push('/register')}
+                className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                注册账号
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );

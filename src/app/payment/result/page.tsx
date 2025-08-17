@@ -45,6 +45,11 @@ export default function PaymentResultPage() {
           if (tradeStatus === 'TRADE_SUCCESS') {
             setStatus('success');
             showSuccess('支付成功！');
+            
+            // 支付成功后刷新用户信息，更新积分显示
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('refreshUserInfo'));
+            }
           } else {
             setStatus('error');
             showError('支付失败或未完成');

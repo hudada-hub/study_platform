@@ -17,7 +17,7 @@ const ForumTabs: React.FC<ForumTabsProps> = ({ activeTab, onTabChange }) => {
         onClick={() => onTabChange('latest')}
         className={`px-6 py-3 text-sm transition-colors ${
           activeTab === 'latest'
-            ? 'text-blue-600 border-b-2 border-blue-600'
+            ? 'text-cyan-600 border-b-2 border-cyan-600'
             : 'text-gray-500 hover:text-gray-700'
         }`}
       >
@@ -27,7 +27,7 @@ const ForumTabs: React.FC<ForumTabsProps> = ({ activeTab, onTabChange }) => {
         onClick={() => onTabChange('recommended')}
         className={`px-6 py-3 text-sm transition-colors ${
           activeTab === 'recommended'
-            ? 'text-blue-600 border-b-2 border-blue-600'
+            ? 'text-cyan-600 border-b-2 border-cyan-600'
             : 'text-gray-500 hover:text-gray-700'
         }`}
       >

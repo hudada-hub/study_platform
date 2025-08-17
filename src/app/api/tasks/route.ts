@@ -33,11 +33,11 @@ export async function GET(request: NextRequest) {
       where.categoryId = parseInt(categoryId);
     }
 
-    // 状态筛选 - 如果没有指定状态，默认显示已通过的任务FR
+    // 状态筛选 - 如果没有指定状态，默认显示已通过的任务
     if (status === 'all') {
-      // 显示4种状态的任务：已通过、执行中、已完成、管理员已确认
+      // 显示2种状态的任务：已通过、执行中
       where.status = {
-        in: ['APPROVED', 'IN_PROGRESS', 'COMPLETED', 'ADMIN_CONFIRMED']
+        in: ['APPROVED', 'IN_PROGRESS']
       };
     } else if (status) {
       where.status = status;
@@ -46,33 +46,21 @@ export async function GET(request: NextRequest) {
       where.status = 'APPROVED';
     }
 
-    // 构建排序 - 优先按置顶排序，然后按发布时间排序
-    let orderBy: any[] = [];
+    // 构建排序 - 优先按置顶排序，然后按指定字段排序
+    let orderBy: any[] = [
+      { isTop: 'desc' },        // 置顶优先
+    ];
     
+    // 根据排序字段添加对应的排序规则
     if (sortBy === 'createdAt') {
-      // 默认排序：置顶优先，然后按创建时间
-      orderBy = [
-        { isTop: 'desc' },        // 置顶优先
-        { createdAt: sortOrder }, // 然后按创建时间排序
-      ];
+      orderBy.push({ createdAt: sortOrder });
     } else if (sortBy === 'points') {
-      // 积分排序：置顶优先，然后按积分排序
-      orderBy = [
-        { isTop: 'desc' },        // 置顶优先
-        { points: sortOrder },    // 然后按积分排序
-      ];
+      orderBy.push({ points: sortOrder });
     } else if (sortBy === 'viewCount') {
-      // 浏览排序：置顶优先，然后按浏览数排序
-      orderBy = [
-        { isTop: 'desc' },        // 置顶优先
-        { viewCount: sortOrder }, // 然后按浏览数排序
-      ];
+      orderBy.push({ viewCount: sortOrder });
     } else {
-      // 其他排序：置顶优先，然后按指定字段排序
-      orderBy = [
-        { isTop: 'desc' },        // 置顶优先
-        { [sortBy]: sortOrder },  // 然后按指定字段排序
-      ];
+      // 其他排序字段
+      orderBy.push({ [sortBy]: sortOrder });
     }
 
     // 查询任务列表

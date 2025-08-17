@@ -77,8 +77,10 @@ const RechargeTab = () => {
             confirmButtonText: '确定'
           });
           
-          // 刷新页面
-          window.location.reload();
+          // 充值成功后刷新用户信息，更新积分显示
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('refreshUserInfo'));
+          }
         }
         // 如果订单关闭
         else if (tradeStatus === 'TRADE_CLOSED') {

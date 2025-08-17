@@ -148,6 +148,11 @@ const PublishedTasksPage = () => {
         method: 'POST',
       });
       if (response.code === 0) {
+        // 任务确认完成后刷新用户信息，更新积分显示
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('refreshUserInfo'));
+        }
+        
         Swal.fire({
           icon: 'success',
           title: '确认完成成功',
@@ -256,7 +261,14 @@ const PublishedTasksPage = () => {
             key="edit" 
             type="text" 
             icon={<EditOutlined />}
-            onClick={() => router.push(`/tasks/publish?edit=${task.id}`)}
+            onClick={() => {
+              // 在当前页面编辑任务，不跳转
+              Swal.fire({
+                icon: 'info',
+                title: '编辑功能',
+                text: '编辑功能将在当前页面实现，无需跳转',
+              });
+            }}
           >
             编辑
           </Button>
@@ -370,7 +382,14 @@ const PublishedTasksPage = () => {
         >
           <Button 
             type="primary" 
-            onClick={() => router.push('/tasks/publish')}
+            onClick={() => {
+              // 在当前页面发布新任务，不跳转
+              Swal.fire({
+                icon: 'info',
+                title: '发布新任务',
+                text: '发布新任务功能将在当前页面实现，无需跳转',
+              });
+            }}
           >
             发布新任务
           </Button>

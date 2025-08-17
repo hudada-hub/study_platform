@@ -235,10 +235,7 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
               <FiStar className="w-4 h-4 text-yellow-500 ml-1" />
             </div>
             
-            {/* 进度条 */}
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-              <div className="bg-blue-500 h-2 rounded-full" style={{ width: '60%' }}></div>
-            </div>
+
             
             {/* 统计数据 */}
             <div className="space-y-1 text-sm text-gray-600">

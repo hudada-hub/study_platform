@@ -83,6 +83,21 @@ export const useGlobalUser = () => {
     fetchUserInfo();
   }, [fetchUserInfo]);
 
+  // 监听全局刷新用户信息事件
+  useEffect(() => {
+    const handleRefreshUserInfo = () => {
+      fetchUserInfo();
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('refreshUserInfo', handleRefreshUserInfo);
+      
+      return () => {
+        window.removeEventListener('refreshUserInfo', handleRefreshUserInfo);
+      };
+    }
+  }, [fetchUserInfo]);
+
   return {
     userInfo,
     loading,

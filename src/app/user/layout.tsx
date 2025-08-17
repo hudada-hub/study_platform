@@ -1,12 +1,51 @@
 'use client'
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { FaUser, FaCog, FaBookOpen, FaHeart, FaShoppingCart, FaTasks, FaComments, FaBars } from 'react-icons/fa';
+import { usePathname, useRouter } from 'next/navigation';
+import { FaUser, FaCog, FaBookOpen, FaHeart, FaShoppingCart, FaTasks, FaComments, FaBars, FaLock } from 'react-icons/fa';
+import { getCurrentUser } from '@/utils/client-auth';
 
 export default function UserLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // 获取当前用户ID和登录状态
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const currentUser = getCurrentUser();
+      if (currentUser?.id) {
+        setCurrentUserId(currentUser.id);
+        setIsLoggedIn(true);
+      } else {
+        setCurrentUserId(null);
+        setIsLoggedIn(false);
+      }
+      setIsLoading(false);
+    };
+
+    // 初始检查
+    checkAuthStatus();
+
+    // 监听登录状态变化
+    const handleStorageChange = () => {
+      checkAuthStatus();
+    };
+
+    // 监听storage事件（跨标签页同步）
+    window.addEventListener('storage', handleStorageChange);
+    
+    // 监听自定义事件（同标签页内登录状态变化）
+    window.addEventListener('userAuthChange', checkAuthStatus);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userAuthChange', checkAuthStatus);
+    };
+  }, []);
   
   const tabs = [
    
@@ -15,7 +54,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
     { label: '论坛管理', path: '/user/forum', icon: <FaComments className="mr-2" /> },
     { label: '我的收藏', path: '/user/favorites', icon: <FaHeart className="mr-2" /> },
     { label: '我的订单', path: '/user/orders', icon: <FaShoppingCart className="mr-2" /> },
-    { label: '个人资料', path: '/profile', icon: <FaUser className="mr-2" /> },
+    { label: '个人资料', path: currentUserId ? `/profile/${currentUserId}` : '/profile', icon: <FaUser className="mr-2" /> },
     { label: '账号设置', path: '/user/settings', icon: <FaCog className="mr-2" /> },
   
 
@@ -23,6 +62,49 @@ export default function UserLayout({ children }: { children: ReactNode }) {
 
   // 获取当前页面标题
   const currentTab = tabs.find(tab => tab.path === pathname);
+
+  // 如果正在加载，显示加载状态
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500"></div>
+          <p className="text-gray-600">加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 如果未登录，显示未登录状态
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-gray-50">
+        <div className="max-w-md w-full mx-auto p-6">
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaLock className="w-8 h-8 text-gray-400" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">需要登录</h2>
+            <p className="text-gray-600 mb-6">请先登录后访问用户中心</p>
+            <div className="space-y-3">
+              <button
+                onClick={() => router.push('/login')}
+                className="w-full bg-cyan-500 text-white py-2 px-4 rounded-md hover:bg-cyan-600 transition-colors"
+              >
+                立即登录
+              </button>
+              <button
+                onClick={() => router.push('/register')}
+                className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                注册账号
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-[40px] py-4">
@@ -50,7 +132,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
                     href={tab.path}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center px-4 py-3 rounded-md transition-colors w-full ${
-                      pathname === tab.path
+                      pathname === tab.path || pathname.startsWith(tab.path + '/')
                         ? 'bg-cyan-500 text-white font-medium'
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
@@ -76,7 +158,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
                   key={tab.path}
                   href={tab.path}
                   className={`flex items-center px-4 py-3 rounded-md transition-colors w-full ${
-                    pathname === tab.path
+                    pathname === tab.path || pathname.startsWith(tab.path + '/')
                       ? 'bg-cyan-500 text-white font-medium'
                       : 'text-gray-700 hover:bg-gray-50'
                   }`}

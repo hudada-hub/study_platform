@@ -42,6 +42,7 @@ export async function GET(
         updatedAt: true,
         attachments: true,
         completedAt: true,
+        noNeedMeConfirmed: true, // 添加noNeedMeConfirmed字段
         category: {
           select: {
             id: true,

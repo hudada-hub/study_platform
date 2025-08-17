@@ -98,6 +98,11 @@ export default function PostDetailPage() {
           icon: 'success',
           title: '取消收藏成功',
           text: '已取消收藏该帖子',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       } else {
         // 添加收藏
@@ -109,6 +114,11 @@ export default function PostDetailPage() {
           icon: 'success',
           title: '收藏成功',
           text: '已成功收藏该帖子',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -226,10 +236,14 @@ export default function PostDetailPage() {
         icon: 'success',
         title: '评论成功',
         text: '您的评论已成功发表',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       setCommentContent('');
-      // 重新获取第一页评论
-      setCurrentPage(1);
+      // 刷新当前页评论，不跳转页面
       fetchComments();
     } catch (error) {
       console.error('评论失败:', error);
@@ -342,16 +356,26 @@ export default function PostDetailPage() {
         icon: 'success',
         title: '举报成功',
         text: '您的举报已提交，我们会尽快处理',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       setReportModalVisible(false);
       setReportContent('');
-    } catch (error) {
+    } catch (error:any) {
       console.error('举报失败:', error);
-      Swal.fire({
-        icon: 'error',
-        title: '举报失败',
-        text: '请稍后重试',
-      });
+              Swal.fire({
+          icon: 'error',
+          title: '举报失败',
+          text: error.message,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
+        });
     }
   };
 

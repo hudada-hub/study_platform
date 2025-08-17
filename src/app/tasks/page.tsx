@@ -120,6 +120,7 @@ const TaskPage: React.FC = () => {
   const handleCategoryChange = (value: number | null) => {
     setSelectedCategory(value);
     setCurrentPage(1);
+    // 移除立即刷新，让useEffect处理
   };
 
   // 处理状态筛选
@@ -128,6 +129,7 @@ const TaskPage: React.FC = () => {
     const statusValue = value === null ? 'all' : value;
     setSelectedStatus(statusValue);
     setCurrentPage(1);
+    // 移除立即刷新，让useEffect处理
   };
 
   // 处理排序
@@ -140,12 +142,12 @@ const TaskPage: React.FC = () => {
 
   // 排序选项
   const sortOptions = [
-    { key: 'createdAt-desc', label: '最新发布' },
-    { key: 'createdAt-asc', label: '最早发布' },
-    { key: 'points-desc', label: '积分最高' },
-    { key: 'points-asc', label: '积分最低' },
-    { key: 'viewCount-desc', label: '浏览最多' },
-    { key: 'viewCount-asc', label: '浏览最少' },
+    { key: 'createdAt-desc', label: '最新发布', field: 'createdAt', order: 'desc' },
+    { key: 'createdAt-asc', label: '最早发布', field: 'createdAt', order: 'asc' },
+    { key: 'points-desc', label: '积分最高', field: 'points', order: 'desc' },
+    { key: 'points-asc', label: '积分最低', field: 'points', order: 'asc' },
+    { key: 'viewCount-desc', label: '浏览最多', field: 'viewCount', order: 'desc' },
+    { key: 'viewCount-asc', label: '浏览最少', field: 'viewCount', order: 'asc' },
   ];
 
   // 获取当前排序的显示文本
@@ -162,8 +164,6 @@ const TaskPage: React.FC = () => {
       APPROVED: { color: 'blue', text: '已通过' },
       REJECTED: { color: 'red', text: '已拒绝' },
       IN_PROGRESS: { color: 'green', text: '执行中' },
-      COMPLETED: { color: 'purple', text: '已完成' },
-      ADMIN_CONFIRMED: { color: 'cyan', text: '管理员已确认完成' },
       PUBLISHER_CONFIRMED: { color: 'green', text: '发布者已确认完成' },
     };
     const config = statusMap[status as keyof typeof statusMap] || { color: 'default', text: status };
@@ -269,7 +269,7 @@ const TaskPage: React.FC = () => {
               <button
                 onClick={() => handleStatusChange(null)}
                 className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  selectedStatus === 'all'
+                  selectedStatus === null || selectedStatus === 'all'
                     ? 'bg-cyan-500 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -299,28 +299,7 @@ const TaskPage: React.FC = () => {
               >
                 执行中任务
               </button>
-              <button
-                onClick={() => handleStatusChange('COMPLETED')}
-                className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  selectedStatus === 'COMPLETED'
-                    ? 'bg-cyan-500 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={loading}
-              >
-                已完成任务
-              </button>
-              <button
-                onClick={() => handleStatusChange('ADMIN_CONFIRMED')}
-                className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  selectedStatus === 'ADMIN_CONFIRMED'
-                    ? 'bg-cyan-500 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={loading}
-              >
-                管理员已确认完成任务
-              </button>
+
             </div>
           </div>
 
@@ -329,8 +308,7 @@ const TaskPage: React.FC = () => {
             <span className="text-sm text-gray-600">排序:</span>
             <div className="flex items-center gap-2">
               {sortOptions.map(option => {
-                const [field, order] = option.key.split('-');
-                const isActive = sortBy === field && sortOrder === order;
+                const isActive = sortBy === option.field && sortOrder === option.order;
                 return (
                   <button
                     key={option.key}

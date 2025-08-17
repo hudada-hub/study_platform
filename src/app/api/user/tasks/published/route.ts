@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
           completedAt: true,
           rejectReason: true,
           createdAt: true,
+          noNeedMeConfirmed: true,
           updatedAt: true,
           category: { select: { id: true, name: true } },
           author: { select: { id: true, nickname: true, avatar: true } },
