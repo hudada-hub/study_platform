@@ -38,7 +38,7 @@ export async function POST(
     });
 
     if (existingFavorite) {
-      return ResponseUtil.serverError('已经收藏过该板块');
+      return ResponseUtil.badRequest('已经收藏过该板块');
     }
 
     // 创建收藏记录

@@ -68,4 +68,12 @@ export class ResponseUtil {
       message,
     }, { status: 500 });
   }
+
+  // 客户端错误响应
+  static badRequest(message: string = '请求参数错误') {
+    return NextResponse.json({
+      code: ResponseCode.ERROR,
+      message,
+    }, { status: 400 });
+  }
 }

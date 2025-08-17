@@ -33,7 +33,7 @@ export async function POST(
     });
 
     if (existingLike) {
-      return ResponseUtil.serverError('已经点赞过该评论');
+      return ResponseUtil.badRequest('已经点赞过该评论');
     }
 
     // 创建点赞记录

@@ -38,7 +38,7 @@ export async function POST(
     });
 
     if (existingFavorite) {
-      return ResponseUtil.badRequest('已经收藏过该帖子');
+      return ResponseUtil.serverError('已经收藏过该帖子');
     }
 
     // 创建收藏记录

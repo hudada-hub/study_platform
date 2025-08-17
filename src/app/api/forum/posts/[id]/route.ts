@@ -15,6 +15,10 @@ export async function GET(
       return ResponseUtil.serverError('无效的帖子ID');
     }
 
+    // 获取当前用户信息（如果已登录）
+    const { user } = await verifyAuth(request);
+    const userId = user?.id;
+
     // 获取帖子详情，包含作者信息和统计数据
     const post = await prisma.forumPost.findUnique({
       where: { id: postId },
@@ -67,6 +71,20 @@ export async function GET(
       },
     });
 
+    // 检查当前用户是否已收藏该帖子
+    let isFavorited = false;
+    if (userId) {
+      const favorite = await prisma.forumPostFavorite.findUnique({
+        where: {
+          userId_postId: {
+            userId,
+            postId,
+          },
+        },
+      });
+      isFavorited = !!favorite;
+    }
+
     // 格式化返回数据
     const formattedPost = {
       id: post.id,
@@ -89,6 +107,7 @@ export async function GET(
       isEssence: post.isEssence,
       isHot: post.isHot,
       status: post.status,
+      isFavorited, // 添加收藏状态字段
       createdAt: post.createdAt.toISOString(),
       updatedAt: post.updatedAt.toISOString(),
     };

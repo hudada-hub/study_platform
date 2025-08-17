@@ -69,6 +69,7 @@ export interface ForumPost {
   isEssence: boolean;
   isHot: boolean;
   status: PostStatus;
+  isFavorited?: boolean; // 当前用户是否已收藏
   createdAt: string;
   updatedAt: string;
   imageUrl?: string;

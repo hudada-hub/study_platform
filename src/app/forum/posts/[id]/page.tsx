@@ -46,7 +46,6 @@ export default function PostDetailPage() {
       fetchPostDetail();
       fetchComments();
       checkLoginStatus();
-      checkFavoriteStatus();
     }
   }, [postId]);
 
@@ -56,6 +55,15 @@ export default function PostDetailPage() {
     }
   }, [postId, currentPage, pageSize]);
 
+  // 当登录状态或帖子数据变化时，更新收藏状态
+  useEffect(() => {
+    if (isLoggedIn && post) {
+      setIsFavorited(post.isFavorited || false);
+    } else if (!isLoggedIn) {
+      setIsFavorited(false);
+    }
+  }, [isLoggedIn, post]);
+
   const checkLoginStatus = () => {
     const authenticated = isAuthenticated();
     setIsLoggedIn(authenticated);
@@ -64,13 +72,9 @@ export default function PostDetailPage() {
   const checkFavoriteStatus = async () => {
     if (!isLoggedIn) return;
     
-    try {
-      const response = await request(`/forum/posts/${postId}/favorite/status`, {
-        method: 'GET',
-      });
-      setIsFavorited((response.data as { isFavorited: boolean }).isFavorited);
-    } catch (error) {
-      console.error('检查收藏状态失败:', error);
+    // 从帖子详情中获取收藏状态，无需单独调用接口
+    if (post?.isFavorited !== undefined) {
+      setIsFavorited(post.isFavorited);
     }
   };
 
@@ -126,18 +130,35 @@ export default function PostDetailPage() {
           toast: true
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('收藏操作失败:', error);
-      Swal.fire({
-        icon: 'error',
-        title: '收藏操作失败',
-        text: '请稍后重试',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        position: 'top-end',
-        toast: true
-      });
+      
+      // 处理特定的错误情况
+      if (error.message === '已经收藏过该帖子') {
+        // 如果已经收藏过，更新状态为已收藏
+        setIsFavorited(true);
+        Swal.fire({
+          icon: 'info',
+          title: '提示',
+          text: '您已经收藏过该帖子',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: '收藏操作失败',
+          text: error.message || '请稍后重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
+        });
+      }
     } finally {
       setFavoriteLoading(false);
     }
@@ -149,7 +170,13 @@ export default function PostDetailPage() {
       const response = await request(`/forum/posts/${postId}`, {
         method: 'GET',
       });
-      setPost(response.data as ForumPost);
+      const postData = response.data as ForumPost;
+      setPost(postData);
+      
+      // 设置收藏状态
+      if (isLoggedIn && postData.isFavorited !== undefined) {
+        setIsFavorited(postData.isFavorited);
+      }
     } catch (error) {
       console.error('获取帖子详情失败:', error);
       Swal.fire({

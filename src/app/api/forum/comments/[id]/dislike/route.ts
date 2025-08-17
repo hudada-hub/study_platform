@@ -33,7 +33,7 @@ export async function POST(
     });
 
     if (existingDislike) {
-      return ResponseUtil.serverError('已经反对过该评论');
+      return ResponseUtil.badRequest('已经反对过该评论');
     }
 
     // 创建反对记录
