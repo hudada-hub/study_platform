@@ -110,6 +110,11 @@ const TaskDetailPage: React.FC = () => {
         icon: 'error',
         title: '获取任务详情失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
@@ -143,6 +148,11 @@ const TaskDetailPage: React.FC = () => {
         icon: 'warning',
         title: '请填写报名理由',
         text: '请详细说明您为什么适合这个任务',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -167,6 +177,11 @@ const TaskDetailPage: React.FC = () => {
           icon: 'success',
           title: '报名成功',
           text: '您的报名信息已更新，等待审核',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         setApplyModalVisible(false);
         setApplyReason('');
@@ -179,6 +194,11 @@ const TaskDetailPage: React.FC = () => {
         icon: 'error',
         title: '报名失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setApplying(false);
@@ -214,6 +234,11 @@ const TaskDetailPage: React.FC = () => {
         icon: 'error',
         title: '点赞失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLiking(false);
@@ -249,6 +274,11 @@ const TaskDetailPage: React.FC = () => {
         icon: 'error',
         title: '收藏失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setFavoriting(false);

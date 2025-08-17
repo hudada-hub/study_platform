@@ -302,6 +302,11 @@ const PublishedTasksPage = () => {
                 icon: 'info',
                 title: '编辑功能',
                 text: '编辑功能将在当前页面实现，无需跳转',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                position: 'top-end',
+                toast: true
               });
             }}
           >
@@ -346,6 +351,11 @@ const PublishedTasksPage = () => {
                     icon: 'error',
                     title: '获取任务信息失败',
                     text: response.message || '请稍后重试',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    position: 'top-end',
+                    toast: true
                   });
                 }
               } catch (error) {
@@ -354,6 +364,11 @@ const PublishedTasksPage = () => {
                   icon: 'error',
                   title: '获取任务信息失败',
                   text: '请稍后重试',
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true,
+                  position: 'top-end',
+                  toast: true
                 });
               }
             }}
@@ -423,6 +438,11 @@ const PublishedTasksPage = () => {
                 icon: 'info',
                 title: '发布新任务',
                 text: '发布新任务功能将在当前页面实现，无需跳转',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                position: 'top-end',
+                toast: true
               });
             }}
           >

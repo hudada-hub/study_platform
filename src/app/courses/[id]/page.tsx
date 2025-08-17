@@ -310,6 +310,11 @@ const CoursePage = () => {
           icon: 'success',
           title: '购买成功',
           text: '您已成功购买整个课程，现在可以观看所有章节',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       } else {
         throw new Error(createOrderRes.message);
@@ -320,6 +325,11 @@ const CoursePage = () => {
         icon: 'error',
         title: '购买失败',
         text: error.message || '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };
@@ -378,8 +388,10 @@ const CoursePage = () => {
           position: "top-end",
           title: res.data.liked ? '点赞成功' : '已取消点赞',
           icon: 'success',
-          timer: 1000,
-          showConfirmButton: false
+          timer: 3000,
+          showConfirmButton: false,
+          timerProgressBar: true,
+          toast: true
         });
       }
     } catch (error) {
@@ -415,8 +427,10 @@ const CoursePage = () => {
         Swal.fire({
           title: res.data.favorited ? '收藏成功' : '已取消收藏',
           icon: 'success',
-          timer: 1000,
-          showConfirmButton: false
+          timer: 3000,
+          showConfirmButton: false,
+          timerProgressBar: true,
+          toast: true
         });
       }
     } catch (error) {

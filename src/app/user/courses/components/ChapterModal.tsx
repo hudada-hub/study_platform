@@ -531,7 +531,10 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
           icon: 'success',
           title: '更新成功',
           showConfirmButton: false,
-          timer: 1500
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       } else {
         await request(`/courses/${courseId}/chapters`, {
@@ -542,7 +545,10 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
           icon: 'success',
           title: '创建成功',
           showConfirmButton: false,
-          timer: 1500
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
 
@@ -562,6 +568,11 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
         icon: 'error',
         title: '操作失败',
         text: error?.message || '请重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };
@@ -729,6 +740,11 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                           icon: 'error',
                           title: '不支持的文件格式',
                           text: '请上传支持格式的视频',
+                          showConfirmButton: false,
+                          timer: 3000,
+                          timerProgressBar: true,
+                          position: 'top-end',
+                          toast: true
                         });
                         return false;
                       }
@@ -751,6 +767,11 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                           icon: 'error',
                           title: '无法识别视频或视频损坏',
                           text: '请重新选择有效的视频文件',
+                          showConfirmButton: false,
+                          timer: 3000,
+                          timerProgressBar: true,
+                          position: 'top-end',
+                          toast: true
                         });
                         return false;
                       }
@@ -782,7 +803,10 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                                 icon: 'success',
                                 title: '上传成功',
                                 showConfirmButton: false,
-                                timer: 1500
+                                timer: 3000,
+                                timerProgressBar: true,
+                                position: 'top-end',
+                                toast: true
                               });
                               setCoverUrl(''); // 上传新视频时重置封面，防止脏数据
                               setCoverCandidates([]);
@@ -825,14 +849,20 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
       icon: 'success',
       title: '抓取封面成功，请选择喜欢的封面',
       showConfirmButton: false,
-      timer: 2000
+      timer: 3000,
+      timerProgressBar: true,
+      position: 'top-end',
+      toast: true
     });
   } else {
     Swal.fire({
       icon: 'error',
       title: '未能抓取到有效封面',
       showConfirmButton: false,
-      timer: 2000
+      timer: 3000,
+      timerProgressBar: true,
+      position: 'top-end',
+      toast: true
     });
   }
 }).catch(() => {
@@ -840,7 +870,10 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
     icon: 'error',
     title: '视频多帧抓取失败',
     showConfirmButton: false,
-    timer: 2000
+    timer: 3000,
+    timerProgressBar: true,
+    position: 'top-end',
+    toast: true
   });
 });
                               }
@@ -850,7 +883,10 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                                 icon: 'error',
                                 title: data.message || '上传失败',
                                 showConfirmButton: false,
-                                timer: 2000
+                                timer: 3000,
+                                timerProgressBar: true,
+                                position: 'top-end',
+                                toast: true
                               });
                               reject();
                             }
@@ -859,7 +895,10 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                               icon: 'error',
                               title: '上传失败',
                               showConfirmButton: false,
-                              timer: 2000
+                              timer: 3000,
+                              timerProgressBar: true,
+                              position: 'top-end',
+                              toast: true
                             });
                             reject();
                           }
@@ -871,7 +910,10 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
                             icon: 'error',
                             title: '上传失败',
                             showConfirmButton: false,
-                            timer: 2000
+                            timer: 3000,
+                            timerProgressBar: true,
+                            position: 'top-end',
+                            toast: true
                           });
                           reject();
                         };

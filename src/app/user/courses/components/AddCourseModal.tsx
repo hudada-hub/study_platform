@@ -117,6 +117,11 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
           icon: 'success',
           title: '课程编辑成功',
           text: '课程信息已成功更新',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       } else {
         // 创建课程
@@ -128,6 +133,11 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
           icon: 'success',
           title: '课程添加成功',
           text: '课程已成功创建',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
       form.resetFields();
@@ -143,6 +153,11 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
         icon: 'error',
         title: editingCourse ? '课程编辑失败' : '课程添加失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
@@ -181,6 +196,11 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
                   icon: 'success',
                   title: '上传成功',
                   text: `${info.file.name} 已成功上传`,
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true,
+                  position: 'top-end',
+                  toast: true
                 });
              
                 setCoverUrl(info.file.response.data.url);
@@ -189,6 +209,11 @@ export default function AddCourseModal({ visible, onClose, editingCourse }: AddC
                   icon: 'error',
                   title: '上传失败',
                   text: `${info.file.name} 上传失败，请重试`,
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true,
+                  position: 'top-end',
+                  toast: true
                 });
               }
             }}
