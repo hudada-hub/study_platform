@@ -51,6 +51,11 @@ const UserRepliesPage = () => {
         icon: 'error',
         title: '获取回复列表失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
@@ -65,6 +70,11 @@ const UserRepliesPage = () => {
         icon: 'error',
         title: '回复不存在',
         text: '该回复可能已被删除',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -91,6 +101,11 @@ const UserRepliesPage = () => {
             icon: 'success',
             title: '删除成功',
             text: '回复已成功删除',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
           fetchUserReplies();
         } else {
@@ -100,12 +115,22 @@ const UserRepliesPage = () => {
               icon: 'error',
               title: '删除失败',
               text: '只能删除自己的回复',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              position: 'top-end',
+              toast: true
             });
           } else {
             Swal.fire({
               icon: 'error',
               title: '删除失败',
               text: response.message || '删除失败',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              position: 'top-end',
+              toast: true
             });
           }
         }
@@ -115,6 +140,11 @@ const UserRepliesPage = () => {
           icon: 'error',
           title: '删除失败',
           text: '删除失败，请稍后重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     }

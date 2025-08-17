@@ -268,7 +268,11 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
       Swal.fire({
         title: '获取章节列表失败',
         icon: 'error',
-        confirmButtonText: '确定'
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };
@@ -421,7 +425,11 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
           title: '无法删除',
           text: '请先删除所有子章节',
           icon: 'error',
-          confirmButtonText: '确定'
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         return;
       }
@@ -456,8 +464,11 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
         Swal.fire({
           title: '删除成功',
           icon: 'success',
-          timer: 1500,
-          showConfirmButton: false
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         
         await refreshChapters();
@@ -467,7 +478,11 @@ const ChapterModal: React.FC<ChapterModalProps> = ({ open, onCancel, courseId })
         title: '删除失败',
         text: error.message,
         icon: 'error',
-        confirmButtonText: '确定'
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };

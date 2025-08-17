@@ -41,6 +41,11 @@ export default function UploadTestPage() {
           icon: 'success',
           title: '上传成功',
           text: '文件已成功上传',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         switch (type) {
           case 'image':
@@ -58,6 +63,11 @@ export default function UploadTestPage() {
           icon: 'error',
           title: '上传失败',
           text: result.message || '上传失败，请重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -66,6 +76,11 @@ export default function UploadTestPage() {
         icon: 'error',
         title: '上传失败',
         text: '请重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setUploading(false);
@@ -103,12 +118,22 @@ export default function UploadTestPage() {
           icon: 'success',
           title: 'URL已更新',
           text: '文件URL已成功更新',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       } else {
         Swal.fire({
           icon: 'error',
           title: 'URL更新失败',
           text: data.message || 'URL更新失败，请重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -117,6 +142,11 @@ export default function UploadTestPage() {
         icon: 'error',
         title: 'URL更新失败',
         text: '请重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setRefreshing(false);

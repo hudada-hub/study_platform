@@ -140,6 +140,11 @@ export default function CoursesPage() {
         icon: 'success',
         title: '删除成功',
         text: '课程已成功删除',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       refreshCourses();
     } catch (error) {
@@ -147,6 +152,11 @@ export default function CoursesPage() {
         icon: 'error',
         title: '删除失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };

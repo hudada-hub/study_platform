@@ -73,6 +73,11 @@ const TaskTab = () => {
         icon: 'error',
         title: '获取收藏任务失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);

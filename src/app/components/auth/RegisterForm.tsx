@@ -58,6 +58,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
         icon: 'warning',
         title: '请输入手机号',
         text: '请输入您的手机号码',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -67,6 +72,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
         icon: 'warning',
         title: '请输入正确的手机号',
         text: '请输入正确的中国大陆手机号码',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -89,6 +99,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
           icon: 'success',
           title: '验证码已发送',
           text: '验证码已发送到您的手机',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         setCountdown(60); // 开始60秒倒计时
         setIsVerified(false); // 重置验证状态
@@ -97,6 +112,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
           icon: 'error',
           title: '发送失败',
           text: response.message || '发送失败，请重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -104,6 +124,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
         icon: 'error',
         title: '发送验证码失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };
@@ -117,6 +142,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
         icon: 'warning',
         title: '请阅读并同意相关协议',
         text: '请先阅读并同意用户协议和隐私政策',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -126,6 +156,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
         icon: 'warning',
         title: '请填写完整信息',
         text: '请填写所有必填项',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -144,6 +179,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
         icon: 'warning',
         title: '昵称长度需在2-20个字符之间',
         text: '请设置合适的昵称长度',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -153,6 +193,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
         icon: 'warning',
         title: '两次输入的密码不一致',
         text: '请确保两次输入的密码相同',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -162,6 +207,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
         icon: 'warning',
         title: '密码长度不能小于6位',
         text: '请设置更安全的密码',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -199,6 +249,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
           icon: 'error',
           title: '创建订单失败',
           text: createOrderRes.message || '请稍后重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error: any) {
@@ -206,6 +261,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
         icon: 'error',
         title: '支付失败',
         text: error.message || '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
@@ -268,6 +328,11 @@ export default function RegisterForm({ onSuccess, onSwitchMode }: RegisterFormPr
             icon: 'error',
             title: '验证失败',
             text: '请重试验证',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
         }}
         onClose={() => setShowCaptcha(false)}

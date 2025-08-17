@@ -219,7 +219,11 @@ export default function WangEditor({
           icon: 'error',
           title: '审核失败',
           text: '图片审核服务异常，请稍后重试',
-          confirmButtonText: '确定'
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         return;
       }
@@ -229,7 +233,11 @@ export default function WangEditor({
           icon: 'warning',
           title: '图片审核未通过',
           text: moderationResult.message,
-          confirmButtonText: '确定'
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         return;
       }
@@ -243,7 +251,11 @@ export default function WangEditor({
         icon: 'error',
         title: '上传失败',
         text: error instanceof Error ? error.message : '图片上传失败',
-        confirmButtonText: '确定'
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setUploading(false);

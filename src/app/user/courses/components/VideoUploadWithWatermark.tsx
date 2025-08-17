@@ -36,12 +36,22 @@ const VideoUploadWithWatermark: React.FC<VideoUploadWithWatermarkProps> = ({ val
             icon: 'success',
             title: '上传成功',
             text: '视频已成功上传',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
         } else {
           Swal.fire({
             icon: 'error',
             title: '上传失败',
             text: data.message || '请重试',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
         }
       } catch (e: any) {
@@ -49,6 +59,11 @@ const VideoUploadWithWatermark: React.FC<VideoUploadWithWatermarkProps> = ({ val
           icon: 'error',
           title: '处理失败',
           text: e.message || '请重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       } finally {
         setUploading(false);

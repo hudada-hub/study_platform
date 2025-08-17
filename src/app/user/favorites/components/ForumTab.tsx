@@ -67,6 +67,11 @@ const ForumTab: React.FC = () => {
         icon: 'error',
         title: '获取收藏帖子失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setPostsLoading(false);
@@ -86,6 +91,11 @@ const ForumTab: React.FC = () => {
         icon: 'error',
         title: '获取收藏板块失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setSectionsLoading(false);
@@ -101,6 +111,11 @@ const ForumTab: React.FC = () => {
         icon: 'success',
         title: '取消收藏成功',
         text: '已取消收藏该帖子',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       fetchFavoritePosts();
     } catch (error) {
@@ -109,6 +124,11 @@ const ForumTab: React.FC = () => {
         icon: 'error',
         title: '取消收藏失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };
@@ -122,6 +142,11 @@ const ForumTab: React.FC = () => {
         icon: 'success',
         title: '取消收藏成功',
         text: '已取消收藏该板块',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       fetchFavoriteSections();
     } catch (error) {
@@ -130,6 +155,11 @@ const ForumTab: React.FC = () => {
         icon: 'error',
         title: '取消收藏失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };

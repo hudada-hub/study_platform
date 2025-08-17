@@ -74,7 +74,11 @@ const RechargeTab = () => {
             title: '充值成功',
             text: '您的积分已到账',
             icon: 'success',
-            confirmButtonText: '确定'
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
           
           // 充值成功后刷新用户信息，更新积分显示
@@ -94,7 +98,11 @@ const RechargeTab = () => {
             title: '支付已取消',
             text: '如需重新支付，请重新发起充值',
             icon: 'warning',
-            confirmButtonText: '确定'
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
         }
       }
@@ -193,7 +201,11 @@ const RechargeTab = () => {
             title: '支付提示',
             text: '请在新打开的页面完成支付',
             icon: 'info',
-            confirmButtonText: '我知道了'
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
       }
       
@@ -208,6 +220,11 @@ const RechargeTab = () => {
         title: '充值失败',
         text: error instanceof Error ? error.message : '请稍后重试',
         icon: 'error',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
@@ -229,7 +246,11 @@ const RechargeTab = () => {
         title: '金额无效',
         text: '请输入大于等于1元的整数金额',
         icon: 'error',
-        confirmButtonText: '确定'
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }

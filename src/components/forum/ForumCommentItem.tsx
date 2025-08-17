@@ -71,6 +71,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
           icon: 'success',
           title: '取消点赞成功',
           text: '已取消点赞该评论',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       } else {
         // 点赞
@@ -81,6 +86,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
           icon: 'success',
           title: '点赞成功',
           text: '已成功点赞该评论',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -89,6 +99,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
         icon: 'error',
         title: '操作失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };
@@ -104,6 +119,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
           icon: 'success',
           title: '取消反对成功',
           text: '已取消反对该评论',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       } else {
         // 反对
@@ -114,6 +134,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
           icon: 'success',
           title: '反对成功',
           text: '已成功反对该评论',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -122,6 +147,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
         icon: 'error',
         title: '操作失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };
@@ -132,6 +162,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
         icon: 'warning',
         title: '请输入举报原因',
         text: '请详细说明举报原因',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -145,6 +180,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
         icon: 'success',
         title: '举报成功',
         text: '您的举报已提交，我们会尽快处理',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       setReportModalVisible(false);
       setReportContent('');
@@ -154,6 +194,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
         icon: 'error',
         title: '举报失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };
@@ -169,6 +214,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
         icon: 'warning',
         title: '请输入回复内容',
         text: '请填写回复内容后再提交',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -185,6 +235,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
           icon: 'success',
           title: '回复成功',
           text: '您的回复已成功发表',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         setShowReplyEditor(false);
         setReplyContent('');
@@ -197,6 +252,11 @@ const ForumCommentItem: React.FC<ForumCommentItemProps> = ({
         icon: 'error',
         title: '回复失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setReplyLoading(false);

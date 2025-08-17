@@ -45,6 +45,11 @@ export default function CreatePostPage() {
         icon: 'error',
         title: '获取板块信息失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setSectionLoading(false);
@@ -66,6 +71,11 @@ export default function CreatePostPage() {
         icon: 'error',
         title: '获取帖子信息失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     }
   };
@@ -87,6 +97,11 @@ export default function CreatePostPage() {
         icon: 'warning',
         title: '请输入标题',
         text: '请填写帖子标题',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -96,6 +111,11 @@ export default function CreatePostPage() {
         icon: 'warning',
         title: '请输入内容',
         text: '请填写帖子内容',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -116,6 +136,11 @@ export default function CreatePostPage() {
           icon: 'success',
           title: '编辑成功',
           text: '帖子已成功更新',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       } else {
         // 发布新帖
@@ -154,6 +179,11 @@ export default function CreatePostPage() {
         icon: 'error',
         title: isEditing ? '编辑失败' : '发帖失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);

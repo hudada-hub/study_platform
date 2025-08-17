@@ -80,6 +80,11 @@ export default function PostDetailPage() {
         icon: 'warning',
         title: '请先登录',
         text: '登录后才能进行收藏操作',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -127,6 +132,11 @@ export default function PostDetailPage() {
         icon: 'error',
         title: '收藏操作失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setFavoriteLoading(false);
@@ -146,6 +156,11 @@ export default function PostDetailPage() {
         icon: 'error',
         title: '获取帖子详情失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
@@ -196,6 +211,11 @@ export default function PostDetailPage() {
         icon: 'warning',
         title: '请输入评论内容',
         text: '请填写评论内容后再提交',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -204,22 +224,30 @@ export default function PostDetailPage() {
     const moderationResult = await moderateText(commentContent);
     
     if (!moderationResult.success) {
-      Swal.fire({
-        icon: 'error',
-        title: '审核失败',
-        text: '内容审核服务异常，请稍后重试',
-        confirmButtonText: '确定'
-      });
+              Swal.fire({
+          icon: 'error',
+          title: '审核失败',
+          text: '内容审核服务异常，请稍后重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
+        });
       return;
     }
     
     if (!moderationResult.isSafe) {
-      Swal.fire({
-        icon: 'warning',
-        title: '内容审核未通过',
-        text: moderationResult.message,
-        confirmButtonText: '确定'
-      });
+              Swal.fire({
+          icon: 'warning',
+          title: '内容审核未通过',
+          text: moderationResult.message,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
+        });
       return;
     }
 
@@ -251,6 +279,11 @@ export default function PostDetailPage() {
         icon: 'error',
         title: '评论失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setCommentLoading(false);
@@ -334,6 +367,11 @@ export default function PostDetailPage() {
         icon: 'warning',
         title: '请先登录',
         text: '登录后才能进行举报操作',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -343,6 +381,11 @@ export default function PostDetailPage() {
         icon: 'warning',
         title: '请输入举报原因',
         text: '请详细说明举报原因',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }

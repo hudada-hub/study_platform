@@ -50,7 +50,11 @@ export const CommentInput = ({
         icon: 'warning',
         title: '提示',
         text: '最多可上传9张图片',
-        confirmButtonText: '确定'
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -97,7 +101,11 @@ export const CommentInput = ({
             icon: 'warning',
             title: '图片审核未通过',
             text: `有${unsafeImages.length}张图片包含违规内容，已自动移除`,
-            confirmButtonText: '确定'
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
           
           // 只保留安全的图片
@@ -113,7 +121,11 @@ export const CommentInput = ({
         icon: 'error',
         title: '上传失败',
         text: error instanceof Error ? error.message : '图片上传失败',
-        confirmButtonText: '确定'
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setUploading(false);
@@ -139,7 +151,11 @@ export const CommentInput = ({
           icon: 'error',
           title: '审核失败',
           text: '内容审核服务异常，请稍后重试',
-          confirmButtonText: '确定'
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         return;
       }
@@ -149,7 +165,11 @@ export const CommentInput = ({
           icon: 'warning',
           title: '内容审核未通过',
           text: moderationResult.message,
-          confirmButtonText: '确定'
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         return;
       }

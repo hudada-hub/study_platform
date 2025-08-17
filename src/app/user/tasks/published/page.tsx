@@ -109,6 +109,11 @@ const PublishedTasksPage = () => {
         icon: 'error',
         title: '获取发布的任务失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
@@ -157,6 +162,11 @@ const PublishedTasksPage = () => {
           icon: 'success',
           title: '确认完成成功',
           text: '任务已完成确认',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         setConfirmModalVisible(false);
         setCurrentTask(null);
@@ -166,6 +176,11 @@ const PublishedTasksPage = () => {
           icon: 'error',
           title: '确认失败',
           text: response.message || '确认失败，请重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -174,6 +189,11 @@ const PublishedTasksPage = () => {
         icon: 'error',
         title: '确认完成失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setConfirming(false);
@@ -220,6 +240,11 @@ const PublishedTasksPage = () => {
           icon: 'success',
           title: '任务删除成功',
           text: '任务已成功删除',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         setDeleteModalVisible(false);
         setDeletingTask(null);
@@ -229,6 +254,11 @@ const PublishedTasksPage = () => {
           icon: 'error',
           title: '删除失败',
           text: response.message || '删除失败，请重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -237,6 +267,11 @@ const PublishedTasksPage = () => {
         icon: 'error',
         title: '删除任务失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setDeleting(false);

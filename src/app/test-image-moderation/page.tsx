@@ -21,7 +21,11 @@ const TestImageModerationPage = () => {
         icon: 'warning',
         title: '提示',
         text: '请输入图片URL或Base64编码',
-        confirmButtonText: '确定'
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -37,14 +41,22 @@ const TestImageModerationPage = () => {
             icon: 'success',
             title: '审核通过',
             text: '图片内容安全',
-            confirmButtonText: '确定'
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
         } else {
           Swal.fire({
             icon: 'error',
             title: '审核未通过',
             text: `图片内容不安全：${moderationResult.message}`,
-            confirmButtonText: '确定'
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
         }
       } else {
@@ -52,7 +64,11 @@ const TestImageModerationPage = () => {
           icon: 'error',
           title: '审核失败',
           text: `审核失败：${moderationResult.message}`,
-          confirmButtonText: '确定'
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -61,7 +77,11 @@ const TestImageModerationPage = () => {
         icon: 'error',
         title: '测试失败',
         text: '测试失败，请稍后重试',
-        confirmButtonText: '确定'
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
@@ -74,7 +94,11 @@ const TestImageModerationPage = () => {
         icon: 'warning',
         title: '提示',
         text: '请先上传图片',
-        confirmButtonText: '确定'
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -92,14 +116,22 @@ const TestImageModerationPage = () => {
           icon: 'success',
           title: '批量审核完成',
           text: `所有图片(${totalCount}张)都通过审核`,
-          confirmButtonText: '确定'
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       } else {
         Swal.fire({
           icon: 'warning',
           title: '批量审核完成',
           text: `${totalCount}张图片中有${unsafeCount}张未通过审核`,
-          confirmButtonText: '确定'
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -108,7 +140,11 @@ const TestImageModerationPage = () => {
         icon: 'error',
         title: '批量测试失败',
         text: '批量测试失败，请稍后重试',
-        confirmButtonText: '确定'
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);

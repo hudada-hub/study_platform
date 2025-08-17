@@ -56,6 +56,11 @@ const UserPostsPage = () => {
         icon: 'error',
         title: '获取帖子列表失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
@@ -75,6 +80,11 @@ const UserPostsPage = () => {
         icon: 'error',
         title: '帖子不存在',
         text: '该帖子可能已被删除',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -101,6 +111,11 @@ const UserPostsPage = () => {
             icon: 'success',
             title: '删除成功',
             text: '帖子已成功删除',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            position: 'top-end',
+            toast: true
           });
           fetchUserPosts();
         } else {
@@ -110,12 +125,22 @@ const UserPostsPage = () => {
               icon: 'error',
               title: '删除失败',
               text: '只能删除自己的帖子',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              position: 'top-end',
+              toast: true
             });
           } else {
             Swal.fire({
               icon: 'error',
               title: '删除失败',
               text: response.message || '删除失败',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              position: 'top-end',
+              toast: true
             });
           }
         }
@@ -125,6 +150,11 @@ const UserPostsPage = () => {
           icon: 'error',
           title: '删除失败',
           text: '删除失败，请稍后重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     }

@@ -100,6 +100,11 @@ const AcceptedTasksPage = () => {
         icon: 'error',
         title: '获取接受的任务失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
@@ -137,6 +142,11 @@ const AcceptedTasksPage = () => {
         icon: 'warning',
         title: '请输入完成证明',
         text: '请详细描述您如何完成这个任务',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
       return;
     }
@@ -162,6 +172,11 @@ const AcceptedTasksPage = () => {
           icon: 'success',
           title: '完成证明提交成功',
           text: '您的完成证明已提交，等待审核',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         setProofModalVisible(false);
         setCurrentTask(null);
@@ -173,6 +188,11 @@ const AcceptedTasksPage = () => {
           icon: 'error',
           title: '提交失败',
           text: response.message || '提交失败，请重试',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
       }
     } catch (error) {
@@ -181,6 +201,11 @@ const AcceptedTasksPage = () => {
         icon: 'error',
         title: '提交完成证明失败',
         text: '请稍后重试',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setSubmittingProof(false);

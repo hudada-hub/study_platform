@@ -60,8 +60,11 @@ export const RatingForm = ({ courseId, onSuccess }: RatingFormProps) => {
         Swal.fire({
           title: '评价已提交',
           icon: 'success',
-          timer: 1500,
-          showConfirmButton: false
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          position: 'top-end',
+          toast: true
         });
         onSuccess?.();
       }
@@ -70,7 +73,12 @@ export const RatingForm = ({ courseId, onSuccess }: RatingFormProps) => {
       Swal.fire({
         title: '评价失败',
         text: '请稍后重试',
-        icon: 'error'
+        icon: 'error',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        position: 'top-end',
+        toast: true
       });
     } finally {
       setLoading(false);
