@@ -83,14 +83,15 @@ export async function GET(
     });
 
     // 根据用户权限过滤帖子状态
-    // 如果是版主或超级管理员，显示所有状态的帖子
+    // 如果是版主或超级管理员，显示所有状态的帖子（除了已删除的）
     // 如果是普通用户，只显示已发布的帖子
     if (!user || !canModerateContent(user as unknown as ClientUser, sectionInfo?.moderatorId)) {
-      whereCondition.status = 'PUBLISHED';
+      // whereCondition.status = 'PUBLISHED';
       whereCondition.isDeleted = false; // 不显示已删除的帖子
     } else {
-      // 版主或超级管理员可以看到所有状态的帖子，但不显示已删除的
+      // 版主或超级管理员可以看到所有状态的帖子（除了已删除的），包括待审核的
       whereCondition.isDeleted = false;
+      // 可以选择是否显示待审核的帖子，这里保持显示所有状态
     }
 
     // 查询帖子总数

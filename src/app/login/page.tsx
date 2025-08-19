@@ -228,7 +228,7 @@ export default function LoginPage() {
                 {loading ? '登录中...' : '登录'}
               </button>
 
-              <div className="flex flex-col space-y-2 text-sm text-center">
+              <div className="flex justify-between items-center space-y-2 text-sm text-center">
                 <Link
                   href="/register"
                   style={{ color: theme.textColor.primary }}

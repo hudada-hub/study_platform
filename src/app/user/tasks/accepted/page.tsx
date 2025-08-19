@@ -228,7 +228,7 @@ const AcceptedTasksPage = () => {
           key="view" 
           type="text" 
           icon={<EyeOutlined />}
-          onClick={() => router.push(`/tasks/${task.id}`)}
+          onClick={() => window.open(`/tasks/${task.id}`, '_blank')}
         >
           查看详情
         </Button>,

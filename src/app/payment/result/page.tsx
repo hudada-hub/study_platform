@@ -40,6 +40,8 @@ export default function PaymentResultPage() {
             title,
           });
 
+          console.log(tradeStatus,'tradeStatus')
+
 
 
           if (tradeStatus === 'TRADE_SUCCESS') {

@@ -93,6 +93,7 @@ model User {
 
   // 角色关联
   userRoles   UserRoleRelation[]
+  withDrawPoints Int      @default(0)  // 提现积分
 
   // 现有关联
   articleComments       ArticleComment[]
@@ -129,6 +130,7 @@ model User {
   taskLikes         TaskLike[]        @relation("TaskLiker")
   taskFavorites     TaskFavorite[]    @relation("TaskFavoriter")
   withdrawRecords   WithdrawRecord[]  // 提现记录
+  userWithdrawRecords UserWithdrawRecord[] // 用户提现记录
 
   messages         UserMessage[]      // 用户留言
   courseChapterLogs   CourseChapterLog[] // 学习行为记录
@@ -821,9 +823,6 @@ enum TaskStatus {
   COMPLETED   // 接单者已完成
   ADMIN_CONFIRMED // 管理员已确认
   PUBLISHER_CONFIRMED   // 发布者已确认
-  WITHDRAW_REQUESTED   // 提现请求中
-  WITHDRAW_SUCCESS   // 提现成功
-  WITHDRAW_FAILED   // 提现失败
 }
 
 // 接单分类表
@@ -997,6 +996,30 @@ model WithdrawRecord {
 
   @@index([taskId])
   @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// 用户提现记录表
+model UserWithdrawRecord {
+  id              Int       @id @default(autoincrement())
+  userId          Int       // 提现用户ID
+  withdrawNo      String    @unique // 提现单号
+  amount          Float     // 提现金额（积分）
+  accountInfo     Json      // 账户信息（JSON格式，包含支付宝账号、真实姓名等）
+  status          String    @default("PENDING") // 提现状态：PENDING, PROCESSING, SUCCESS, FAILED, CANCELLED
+  alipayOrderId   String?   // 支付宝订单号
+  alipayResponse  Json?     // 支付宝响应信息
+  processedAt     DateTime? // 处理时间
+  completedAt     DateTime? // 完成时间
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // 关联关系
+  user            User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([withdrawNo])
   @@index([status])
   @@index([createdAt])
 }

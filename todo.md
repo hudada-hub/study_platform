@@ -1,5 +1,19 @@
 
-用户注册，线上回调，
+pg_dump -Fc -U wzqwzq -d star_graph -f backup1.dump
+恢复到新数据库
+bash
+复制
+pg_restore -U wzqwzq -d new_db -v backup1.dump
+
+DATABASE_URL="postgresql://wzqwzq:WZQwzq1012@localhost:5432/star_graph?schema=public"
+备份数据
+
+pg_dump -Fc -U wzqwzq -d star_graph -f backup.dump
+恢复到新数据库
+
+pg_restore -U wzqwzq -d new_db -v backup.dump
+
+用户注册，线上回调
 
 积分保证实时刷新
 

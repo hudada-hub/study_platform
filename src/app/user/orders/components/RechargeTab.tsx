@@ -335,7 +335,7 @@ const RechargeTab = () => {
               立即充值
             </Button>
           </div>
-          <div className="text-gray-500">
+          <div className="text-gray-500 text-sm">
             {customAmount && customAmount >= 1
               ? `充值${customAmount}元可获得${calculatePoints(customAmount)}积分`
               : '请输入大于等于1元的整数金额'}

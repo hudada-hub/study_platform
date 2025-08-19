@@ -41,9 +41,10 @@ const UserAvatar: React.FC = () => {
         <div className=" rounded-full flex items-center justify-center text-white">
           {userInfo?.avatar ? (
             <img
+
               src={userInfo.avatar}
               alt={userInfo.nickname}
-              className="w-8 h-8 rounded-full object-cover w-8 h-8 border-2 border-white"
+              className="w-10 h-10 rounded-full object-cover w-8 h-8 border-2 border-white bg-zinc-200"
             />
           ) : (
             <LoginButton onAfterClick={() => setIsDropdownOpen(false)} />
