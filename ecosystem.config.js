@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "next-app",       // 应用名称
+      name: "study_platform",       // 应用名称
       script: "npm",           // 使用 npm 作为启动器
       args: "start",          // 运行 npm start
       cwd: "/root/study_platform", // 应用绝对路径
