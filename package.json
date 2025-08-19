@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "postinstall": "prisma generate",
-    "build": "next build -p 3005",
-    "start": "next start",
+    "build": "next build ",
+    "start": "next start -p 3005",
     "lint": "next lint",
     "batch-add-courses": "tsx scripts/batchAddCourses.ts",
     "prisma": "prisma generate&&npx prisma db push",
