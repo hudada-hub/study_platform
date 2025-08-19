@@ -4,17 +4,19 @@
 version: '3.8'
 
 services:
-  web:
+  postgres:
+    image: postgres:15
     environment:
-      - NODE_ENV=production
-    build:
-      context: .
-      dockerfile: Dockerfile
+      - POSTGRES_DB=study_platform
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root123456
+      - DATABASE_URL=postgresql://root:root123456@49.233.182.71:5455/study_platform?schema=public
     ports:
-      - "3000:3000"
+      - "5455:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app_network
-  
 
   # nginx:
   #   image: nginx:latest
@@ -31,6 +33,8 @@ services:
   #     - web
   #   command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
 
+volumes:
+  postgres_data:
 
 networks:
   app_network:
